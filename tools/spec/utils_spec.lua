@@ -99,6 +99,13 @@ describe("Utils.extractFileNumber", function()
   it("returns nil for multi-extension with no digit run (photo.tar.gz)", function()
     assert.is_nil(Utils.extractFileNumber("photo.tar.gz"))
   end)
+
+  it("returns the FIRST underscore digit run for multi-underscore names", function()
+    -- photo_2024_0042: returns "2024" (first run), not "0042" (last run).
+    -- Camera-roll names like DSC_7877 always have exactly one digit group,
+    -- so first-match is correct for the expected input domain.
+    assert.equals("2024", Utils.extractFileNumber("photo_2024_0042.jpg"))
+  end)
 end)
 
 describe("Utils.joinPath", function()
