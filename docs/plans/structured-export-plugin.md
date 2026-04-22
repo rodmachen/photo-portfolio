@@ -292,7 +292,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 10 — README + logging polish
+### Step 10 — README + logging polish ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/README.md`

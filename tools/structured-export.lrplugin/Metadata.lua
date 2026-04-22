@@ -1,4 +1,6 @@
 local ok, LrTasks = pcall(require, 'LrTasks')
+local _okLog, LrLogger = pcall(require, 'LrLogger')
+local logger = _okLog and type(LrLogger) == 'function' and LrLogger('StructuredExport') or nil
 
 local Metadata = {}
 
@@ -67,7 +69,7 @@ function Metadata.applyIptcFields(filePath, prefs)
   if not bin then
     if not _exiftoolWarned then
       _exiftoolWarned = true
-      LrTasks.execute('logger -t structured-export "exiftool not found; IPTC fields skipped"')
+      if logger then logger:info('exiftool not found; IPTC fields skipped') end
     end
     return true, nil
   end

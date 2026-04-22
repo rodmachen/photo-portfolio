@@ -2,13 +2,17 @@ local LrView            = import('LrView')
 local LrBinding         = import('LrBinding')
 local LrDialogs         = import('LrDialogs')
 local LrFunctionContext = import('LrFunctionContext')
+local LrLogger          = import('LrLogger')
 
 local Prefs = require('Prefs')
+
+local logger = LrLogger('StructuredExport')
 
 local ExportDialog = {}
 
 function ExportDialog.run(activePhoto)
   local result = { action = 'cancel', values = {} }
+  logger:info('ExportDialog opened')
 
   LrFunctionContext.callWithContext('structuredExportDialog', function(context)
     local f  = LrView.osFactory()
@@ -100,6 +104,7 @@ function ExportDialog.run(activePhoto)
       title   = 'Structured Export',
       contents = contents,
     }
+    logger:info('ExportDialog result: ' .. tostring(action))
 
     if action == 'ok' then
       if props.remember then
