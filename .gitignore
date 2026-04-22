@@ -27,3 +27,7 @@ pnpm-debug.log*
 .vercel/
 
 .claude/settings.local.json
+
+# Lua
+*.luac
+tools/.luarocks/

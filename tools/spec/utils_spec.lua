@@ -1,0 +1,2 @@
+-- Placeholder test file for utils
+-- Tests will be added in Step 2
