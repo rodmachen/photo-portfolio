@@ -1,0 +1,25 @@
+{
+  "batch": "D",
+  "steps_completed": [5, 6, 7, 8],
+  "commits": ["889a1a5", "9e894e7", "ffd92a6", "f89cd94"],
+  "files_changed": [
+    "tools/structured-export.lrplugin/Metadata.lua",
+    "tools/spec/metadata_spec.lua",
+    "tools/structured-export.lrplugin/Collections.lua",
+    "tools/spec/collections_spec.lua",
+    "tools/structured-export.lrplugin/ExportDialog.lua",
+    "tools/structured-export.lrplugin/Info.lua"
+  ],
+  "verify": {
+    "busted_exit": 0,
+    "luacheck_exit": 0,
+    "specs_count": 88
+  },
+  "notes": "ExportDialog.lua uses import() for all LR SDK modules (already in .luacheckrc globals) so no .luacheckrc changes were needed. The 'preset' field is persisted on Remember per spec line 33. The exiftool resolver checks absolute paths via io.open and falls back to probing bare 'exiftool' via os.execute. Collections walker pushes pathSegments down during recursion (cleaner than walking parent chain up). Mixed selection test covers both Set expansion and bare Collection in one enumerate call.",
+  "assumptions": [
+    "Prefs.load() does not yet return 'preset' key — ExportDialog defaults to 'print' via 'or' fallback; Prefs.save() will persist it for next load.",
+    "ExportDialog is only ever required from inside Lightroom (no busted tests needed), so no pcall guards on LR imports.",
+    "Info.lua menu items point to ExportTask.lua which will be written in Step 9 (Batch E)."
+  ],
+  "blockers": null
+}
