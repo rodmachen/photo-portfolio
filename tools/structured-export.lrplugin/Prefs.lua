@@ -16,6 +16,7 @@ function Prefs.getDefaults()
     webStatement = 'https://rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
     contentCredentials = true,
+    preset             = 'print',
   }
 end
 
@@ -29,6 +30,7 @@ function Prefs.load()
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
     contentCredentials = (p.contentCredentials == nil) and d.contentCredentials or p.contentCredentials,
+    preset             = p.preset or d.preset,
   }
 end
 
