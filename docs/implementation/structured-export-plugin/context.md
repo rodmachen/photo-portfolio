@@ -54,6 +54,26 @@ Builds a Lightroom Classic plugin (`tools/structured-export.lrplugin/`) that exp
 
 ## Run Log
 
+## Completion
+
+All implementation, review, and feedback phases complete. Step 11 (manual verification in Lightroom Classic) is Rod-driven and is the only remaining item before merge.
+
+- **Final state**: 92 busted specs pass, 0 luacheck warnings, branch pushed to origin, PR #1 description updated with the full plan checklist.
+- **Commits on branch**: 17 (10 plan steps + 5 review-fix groups + 1 feedback report + 1 orchestration trail).
+- **Total subagent runs**: 7 implementation + 1 review + 1 feedback = 9 invocations.
+- **Cost note**: Batch B used cache aggressively (~1.5M cache reads). Per-batch cost figures are inside each `results/*.json`.
+
+### Phase 5 (Task #9) — completed
+- Both blocking findings fixed: B1 (`Prefs.preset` round-trip) and B2 (`Collections.enumerate` accepts `LrPublishedCollectionSet` via `:type():match('CollectionSet$')`).
+- 7 non-blocking items fixed: N1, N2, N3, N5, N6, N7, N9, N10. (Spec count grew 88 → 92.)
+- 2 deferred with rationale: N4 (summary dialog API choice — implementation is strictly better UX), N8 (collision button order — taste).
+- Initial spawn failed with `cat: ... No such file or directory` because bash CWD had drifted. Re-spawned with absolute `cd /Users/rodmachen/code/photo-portfolio &&` prefix. CWD drift is the dominant friction in this orchestration; future runs should always prepend the absolute cd.
+
+### Phase 4 (Task #8) — completed
+- Opus xhigh review found 2 blocking + 10 non-blocking issues in 4 minutes.
+- Output written to `review.md` with structured JSON.
+- Caught a real bug (B1) that the Batch D subagent had explicitly rationalized as "fine" — illustrating why the review pass is worth the cost.
+
 ### Batch F (Task #7) — completed
 - Step 10 (README + logging audit) done. Commit: `80034ec`.
 - Logger audit notably caught a real bug in `Metadata.lua`: the original code shelled out to `LrTasks.execute('logger -t ...')` (the macOS `logger` binary) instead of using `LrLogger`. Replaced with proper `LrLogger('StructuredExport')` via pcall-require guard.
