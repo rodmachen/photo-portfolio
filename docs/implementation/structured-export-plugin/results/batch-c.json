@@ -1,0 +1,21 @@
+{
+  "batch": "C",
+  "steps_completed": [4],
+  "commits": ["1c7d6e28eac6ba2eae14a10b82ea5fdb57e61a53"],
+  "files_changed": [
+    "tools/spec/prefs_spec.lua",
+    "tools/structured-export.lrplugin/Prefs.lua"
+  ],
+  "verify": {
+    "busted_exit": 0,
+    "luacheck_exit": 0,
+    "specs_count": 74
+  },
+  "spec_defaults_match": true,
+  "assumptions": [
+    "Defaults confirmed against docs/lightroom-export-spec.md lines 27-31",
+    "Injection seam pattern (Prefs._prefsProvider) enables pure unit tests without SDK loading",
+    "contentCredentials boolean handling uses nil-coalescing to preserve false when explicitly stored"
+  ],
+  "blockers": null
+}

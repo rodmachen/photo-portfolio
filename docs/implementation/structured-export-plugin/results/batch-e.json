@@ -1,0 +1,27 @@
+{
+  "batch": "E",
+  "steps_completed": [9],
+  "commits": ["75c7512125ce90e50feb434382a02c47e30e0134"],
+  "files_changed": [
+    "docs/plans/structured-export-plugin.md",
+    "tools/structured-export.lrplugin/ContentCredentials.lua",
+    "tools/structured-export.lrplugin/ExportTask.lua"
+  ],
+  "verify": {
+    "busted_exit": 0,
+    "luacheck_exit": 0,
+    "loadfile_exit": 0
+  },
+  "notes": "Per-photo filename strategy: one LrExportSession per collection (single preset per run per Locked Decision #9). Each rendition renders with Lightroom's default name to the per-(collection,preset) destination directory, then LrFileUtils.move renames it to the slug-based filename during the rendition loop. Chose this over LR_tokenCustomString / token-based renaming because the renaming-tokens system does not support a per-photo custom string inside a single ExportSession, and a one-session-per-photo loop would be heavyweight. For overwrite collisions, the code pre-deletes any existing file at the destination before LrFileUtils.move (LR's move does not overwrite). Content Credentials apply() tries LR_embedContentCredentials first then LR_contentCredentials; both pcall-wrapped; no user-facing surface on failure. LR_renamingTokensOn=false so LR uses source filenames, which the move step overrides anyway. Filename fallback sequence is zero-padded %05d counter shared across the whole run.",
+  "assumptions": [
+    "catalog:getActiveSources() returns a list-like table iterable via ipairs; filter by src:type() matching LrCollection/LrCollectionSet/LrPublishedCollection/LrPublishedCollectionSet.",
+    "LrDialogs.confirm(message, info, actionVerb, cancelVerb, otherVerb) returns 'ok' | 'cancel' | 'other'; used for both collision prompt and summary-with-Reveal.",
+    "LrFileUtils.move returns ok, err and does NOT overwrite an existing destination; delete-then-move handles overwrite case.",
+    "LrProgressScope:setCancelable(true) + :isCanceled() is how user cancellation surfaces mid-rendition loop.",
+    "rendition:waitForRender() returns ok, pathOrErr where path is the rendered file's absolute location.",
+    "rendition.photo field maps back to the LrPhoto object passed via photosToExport, usable as a Lua table key.",
+    "LrPathUtils.expandPath resolves ~ to the user home on macOS.",
+    "logger:enable('logfile') writes to ~/Documents/LrClassicLogs/ — standard LrLogger behavior."
+  ],
+  "blockers": null
+}

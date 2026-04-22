@@ -1,0 +1,62 @@
+{
+  "batch": "F",
+  "steps_completed": [10],
+  "commits": ["80034ec600324cbc6c5e4380efa60adaed0eac20"],
+  "files_changed": [
+    "tools/structured-export.lrplugin/README.md",
+    "tools/structured-export.lrplugin/Metadata.lua",
+    "tools/structured-export.lrplugin/ExportDialog.lua",
+    "docs/plans/structured-export-plugin.md"
+  ],
+  "verify": {
+    "busted_exit": 0,
+    "busted_summary": "88 successes / 0 failures / 0 errors / 0 pending",
+    "luacheck_exit": 0,
+    "luacheck_summary": "0 warnings / 0 errors in 15 files"
+  },
+  "logger_audit_changes": [
+    {
+      "file": "Metadata.lua",
+      "change": "Replaced LrTasks.execute('logger -t structured-export ...') with LrLogger('StructuredExport') via pcall-require guard. The macOS system logger call was wrong for this context and would have failed silently in older environments."
+    },
+    {
+      "file": "ExportDialog.lua",
+      "change": "Added import('LrLogger') and local logger = LrLogger('StructuredExport'). Added logger:info at dialog open and after presentModalDialog result."
+    },
+    {
+      "file": "ExportTask.lua",
+      "change": "No changes needed — already had correct LrLogger('StructuredExport') with logger:enable('logfile'), logger:info for normal events, logger:error for caught failures."
+    },
+    {
+      "file": "ContentCredentials.lua",
+      "change": "No changes needed — already had correct LrLogger('StructuredExport') and logger:info."
+    },
+    {
+      "file": "Collections.lua",
+      "change": "No changes needed — pure recursive walker with no SDK-dependent paths; no events worth logging at this level."
+    },
+    {
+      "file": "Prefs.lua",
+      "change": "No changes needed — thin LrPrefs adapter; no events worth logging."
+    },
+    {
+      "file": "Utils.lua",
+      "change": "No changes needed — pure helper functions, no side effects."
+    },
+    {
+      "file": "Presets.lua",
+      "change": "No changes needed — pure data table."
+    },
+    {
+      "file": "Info.lua",
+      "change": "No changes needed — SDK manifest, no logic."
+    }
+  ],
+  "assumptions": [
+    "LrLogger 'logfile' target writes to ~/Documents/LrClassicLogs/StructuredExport.log — this is the documented Lightroom SDK convention for the logfile target with a named logger.",
+    "All modules sharing the logger name 'StructuredExport' are covered by the logger:enable('logfile') call in ExportTask.lua; secondary modules do not need their own enable call.",
+    "ExportDialog.lua is LR-only (uses import() throughout) so adding import('LrLogger') is safe and does not affect busted test runs, which do not load ExportDialog.",
+    "Metadata.lua uses pcall-require for LrLogger to preserve its dual-environment compatibility (busted + LR); in test runs the logger variable is nil and the guard 'if logger then' prevents any call."
+  ],
+  "blockers": null
+}
