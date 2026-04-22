@@ -1,0 +1,27 @@
+{
+  "batch": "B",
+  "steps_completed": [2, 3],
+  "commits": ["a0544b8", "c73d02d"],
+  "files_changed": [
+    "tools/structured-export.lrplugin/Utils.lua",
+    "tools/spec/utils_spec.lua",
+    "tools/structured-export.lrplugin/Presets.lua",
+    "tools/spec/presets_spec.lua"
+  ],
+  "verify": {
+    "busted_exit": 0,
+    "luacheck_exit": 0,
+    "specs_count": 72
+  },
+  "sdk_resize_type_source": "community fallback",
+  "assumptions": [
+    "LR_size_resizeType 'shortEdge'/'longEdge' require SDK 9.0+ (LR Classic >= 9.0). Safe given plan's LR >= 13 minimum.",
+    "extractFileNumber returns the first underscore-prefixed digit run, not the final digit group — so IMG_0001-Edit-2.DNG returns '0001', not '2'. Documented in utils_spec.lua.",
+    "slugify is ASCII-only: accented characters (multi-byte UTF-8) are stripped by the [a-zA-Z0-9-] character class. Documented in spec comment.",
+    "joinPath trims trailing slashes from each segment in the fallback path (LrPathUtils not available under busted).",
+    "Local Lightroom SDK not found at /Applications/Adobe Lightroom Classic/SDK/. All SDK constants sourced from community documentation.",
+    "LR_outputSharpeningLevel 2 = Standard is consistent across all three presets per plan spec.",
+    "busted specs do not use require('spec_helper') — the .busted 'helper' config already runs spec_helper.lua, which sets up package.path. Explicit require removed to avoid double-load error."
+  ],
+  "blockers": null
+}
