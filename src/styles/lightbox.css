@@ -1,0 +1,4 @@
+/* PhotoSwipe overrides for dark theme */
+.pswp {
+  --pswp-bg: #0a0a0a;
+}

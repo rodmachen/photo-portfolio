@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About — Rod Machen Photography">
+  <div class="about">
+    <h1>About</h1>
+    <p>
+      Photography by Rod Machen. This site showcases a collection of work
+      across various subjects and locations.
+    </p>
+    <p>
+      For inquiries, reach out at
+      <a href="https://rodmachen.com">rodmachen.com</a>.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: 640px;
+  }
+
+  .about h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .about p {
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+</style>

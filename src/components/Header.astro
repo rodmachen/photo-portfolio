@@ -1,0 +1,68 @@
+---
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/albums', label: 'Albums' },
+  { href: '/about', label: 'About' },
+];
+---
+
+<header class="site-header">
+  <nav class="nav">
+    <a href="/" class="nav-brand">Rod Machen</a>
+    <ul class="nav-links">
+      {navLinks.map(({ href, label }) => (
+        <li>
+          <a href={href} class:list={[{ active: Astro.url.pathname === href }]}>
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .nav-brand:hover {
+    text-decoration: none;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+  }
+
+  .nav-links a {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+</style>

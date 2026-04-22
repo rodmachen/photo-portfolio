@@ -1,0 +1,17 @@
+---
+// PhotoSwipe lightbox initialization - client-side only
+---
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.css" />
+
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '#gallery',
+    children: 'a',
+    pswpModule: () => import('photoswipe'),
+  });
+
+  lightbox.init();
+</script>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://photo.rodmachen.com/sitemap.xml

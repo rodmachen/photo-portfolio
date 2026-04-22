@@ -1,0 +1,24 @@
+title: Tennis
+slug: tennis
+description: Tennis photography
+cover: atx-open-2025-8106_jd1zlc
+order: 2
+children:
+  - title: ATX Open 2025
+    slug: atx-open-2025
+    description: Coverage of the 2025 ATX Open
+    folder: photo-portfolio/tennis/atx-open-2025
+    cover: atx-open-2025-8106_jd1zlc
+    order: 1
+  - title: ATX Open 2024
+    slug: atx-open-2024
+    description: Coverage of the 2024 ATX Open
+    folder: photo-portfolio/tennis/atx-open-2024
+    cover: atx-open-2024-5848_copy_nkrka6
+    order: 2
+  - title: ATX Open 2023
+    slug: atx-open-2023
+    description: Coverage of the 2023 ATX Open
+    folder: photo-portfolio/tennis/atx-open-2023
+    cover: Marta-Kostyuk-3-Sunday_dg2vkl
+    order: 3

@@ -1,0 +1,75 @@
+---
+import { CldImage } from 'astro-cloudinary';
+
+interface Props {
+  slug: string;
+  title: string;
+  cover: string;
+  photoCount: number;
+}
+
+const { slug, title, cover, photoCount } = Astro.props;
+---
+
+<a href={`/albums/${slug}`} class="album-card">
+  <div class="album-card-image">
+    <CldImage
+      src={cover}
+      width={600}
+      height={400}
+      alt={title}
+      crop="fill"
+      gravity="auto"
+      sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
+      loading="lazy"
+    />
+  </div>
+  <div class="album-card-info">
+    <h2>{title}</h2>
+    <span class="photo-count">{photoCount} photos</span>
+  </div>
+</a>
+
+<style>
+  .album-card {
+    display: block;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-surface);
+    transition: transform 0.2s ease;
+  }
+
+  .album-card:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  .album-card-image {
+    overflow: hidden;
+  }
+
+  .album-card-image img {
+    width: 100%;
+    height: auto;
+    transition: opacity 0.2s ease;
+  }
+
+  .album-card:hover .album-card-image img {
+    opacity: 0.85;
+  }
+
+  .album-card-info {
+    padding: 1rem;
+  }
+
+  .album-card-info h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .photo-count {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+</style>

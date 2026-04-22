@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AlbumCard from '../components/AlbumCard.astro';
+import { getCollection } from 'astro:content';
+
+const albums = await getCollection('albums');
+const photos = await getCollection('photos');
+
+// Sort albums by order field
+const sortedAlbums = albums.sort((a, b) => a.data.order - b.data.order);
+
+// Count photos per album — for parent albums, sum all children's folders
+function getPhotoCount(album: (typeof albums)[number]['data']): number {
+  if (album.children) {
+    return album.children.reduce(
+      (sum, child) =>
+        sum + photos.filter((p) => p.data.asset_folder === child.folder).length,
+      0
+    );
+  }
+  return photos.filter((p) => p.data.asset_folder === album.folder).length;
+}
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>Photography</h1>
+    <p>by Rod Machen</p>
+  </section>
+
+  <section class="album-grid">
+    {sortedAlbums.map((album) => (
+      <AlbumCard
+        slug={album.data.slug}
+        title={album.data.title}
+        cover={album.data.cover}
+        photoCount={getPhotoCount(album.data)}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0 4rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero p {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+  }
+
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .album-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,17 @@
+{
+  "name": "photo-rodmachen",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "^9.0.4",
+    "astro": "^5.17.1",
+    "astro-cloudinary": "^1.3.5",
+    "photoswipe": "^5.4.4"
+  }
+}

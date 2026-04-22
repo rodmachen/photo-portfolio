@@ -1,0 +1,16 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import '../styles/masonry.css';
+import '../styles/lightbox.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <slot />
+</BaseLayout>

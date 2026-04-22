@@ -1,0 +1,121 @@
+---
+import GalleryLayout from '../../layouts/GalleryLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MasonryGrid from '../../components/MasonryGrid.astro';
+import PhotoCard from '../../components/PhotoCard.astro';
+import AlbumCard from '../../components/AlbumCard.astro';
+import Lightbox from '../../components/Lightbox.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const albums = await getCollection('albums');
+  const photos = await getCollection('photos');
+
+  return albums.map((album) => {
+    if (album.data.children) {
+      // Parent album — pass children and photos for counting
+      return {
+        params: { slug: album.data.slug },
+        props: {
+          album: album.data,
+          isParent: true,
+          children: album.data.children.sort((a, b) => a.order - b.order),
+          photos,
+        },
+      };
+    }
+
+    // Simple album — pass filtered photos
+    const albumPhotos = photos.filter((p) =>
+      p.data.asset_folder === album.data.folder
+    );
+
+    return {
+      params: { slug: album.data.slug },
+      props: { album: album.data, isParent: false, photos: albumPhotos },
+    };
+  });
+}
+
+const { album, isParent, children, photos } = Astro.props;
+
+function getPhotoCount(folder: string): number {
+  return photos.filter((p: any) => p.data.asset_folder === folder).length;
+}
+---
+
+{isParent ? (
+  <BaseLayout
+    title={`${album.title} — Rod Machen Photography`}
+    description={album.description}
+  >
+    <header class="album-header">
+      <h1>{album.title}</h1>
+      <p>{album.description}</p>
+    </header>
+
+    <section class="album-grid">
+      {children.map((child: any) => (
+        <AlbumCard
+          slug={`${album.slug}/${child.slug}`}
+          title={child.title}
+          cover={child.cover}
+          photoCount={getPhotoCount(child.folder)}
+        />
+      ))}
+    </section>
+  </BaseLayout>
+) : (
+  <GalleryLayout
+    title={`${album.title} — Rod Machen Photography`}
+    description={album.description}
+  >
+    <header class="album-header">
+      <h1>{album.title}</h1>
+      <p>{album.description}</p>
+    </header>
+
+    <MasonryGrid>
+      {photos.map((photo: any) => (
+        <PhotoCard
+          publicId={photo.data.public_id}
+          width={photo.data.width}
+          height={photo.data.height}
+          alt={photo.data.display_name || ''}
+        />
+      ))}
+    </MasonryGrid>
+
+    <Lightbox />
+  </GalleryLayout>
+)}
+
+<style>
+  .album-header {
+    margin-bottom: 2rem;
+  }
+
+  .album-header h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .album-header p {
+    color: var(--color-text-muted);
+  }
+
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .album-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

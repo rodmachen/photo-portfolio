@@ -1,0 +1,11 @@
+---
+interface Props {
+  id?: string;
+}
+
+const { id = 'gallery' } = Astro.props;
+---
+
+<div id={id} class="masonry pswp-gallery">
+  <slot />
+</div>

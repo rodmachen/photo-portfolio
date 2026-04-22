@@ -1,0 +1,92 @@
+---
+import GalleryLayout from '../../../layouts/GalleryLayout.astro';
+import MasonryGrid from '../../../components/MasonryGrid.astro';
+import PhotoCard from '../../../components/PhotoCard.astro';
+import Lightbox from '../../../components/Lightbox.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const albums = await getCollection('albums');
+  const photos = await getCollection('photos');
+
+  const paths: any[] = [];
+
+  for (const album of albums) {
+    if (!album.data.children) continue;
+
+    for (const child of album.data.children) {
+      const childPhotos = photos.filter((p) =>
+        p.data.asset_folder === child.folder
+      );
+
+      paths.push({
+        params: { slug: album.data.slug, sub: child.slug },
+        props: {
+          parent: album.data,
+          child,
+          photos: childPhotos,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { parent, child, photos } = Astro.props;
+---
+
+<GalleryLayout
+  title={`${child.title} — ${parent.title} — Rod Machen Photography`}
+  description={child.description}
+>
+  <header class="album-header">
+    <a href={`/albums/${parent.slug}`} class="breadcrumb">{parent.title}</a>
+    <h1>{child.title}</h1>
+    <p>{child.description}</p>
+  </header>
+
+  <MasonryGrid>
+    {photos.map((photo: any) => (
+      <PhotoCard
+        publicId={photo.data.public_id}
+        width={photo.data.width}
+        height={photo.data.height}
+        alt={photo.data.display_name || ''}
+      />
+    ))}
+  </MasonryGrid>
+
+  <Lightbox />
+</GalleryLayout>
+
+<style>
+  .album-header {
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb {
+    display: inline-block;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .breadcrumb:hover {
+    color: var(--color-text);
+  }
+
+  .album-header h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .album-header p {
+    color: var(--color-text-muted);
+  }
+</style>
