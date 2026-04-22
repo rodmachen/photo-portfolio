@@ -16,15 +16,17 @@ local function resolveExiftool()
     'exiftool',
   }
   for _, path in ipairs(candidates) do
-    local f = io.open(path == 'exiftool' and '/dev/null' or path, 'r')
-    if path ~= 'exiftool' and f then
-      f:close()
-      _exiftoolPath = path
-      return _exiftoolPath
-    elseif path == 'exiftool' then
-      -- bare command: try os.execute to probe
+    if path == 'exiftool' then
+      -- bare command: probe via shell without touching io.open
       local ok2 = os.execute('command -v exiftool > /dev/null 2>&1')
       if ok2 == 0 or ok2 == true then
+        _exiftoolPath = path
+        return _exiftoolPath
+      end
+    else
+      local f = io.open(path, 'r')
+      if f then
+        f:close()
         _exiftoolPath = path
         return _exiftoolPath
       end
@@ -62,6 +64,7 @@ local _exiftoolWarned = false
 -- Returns ok (bool), err (string or nil).
 function Metadata.applyIptcFields(filePath, prefs)
   if not ok or not LrTasks then
+    if logger then logger:error('LrTasks unavailable; IPTC fields skipped') end
     return true, nil  -- graceful degrade when not in LR environment
   end
 
