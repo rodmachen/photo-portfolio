@@ -129,7 +129,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 2 — `Utils.lua` (pure logic, TDD)
+### Step 2 — `Utils.lua` (pure logic, TDD) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Utils.lua`
@@ -151,7 +151,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 3 — `Presets.lua` (preset → LR_* settings, TDD)
+### Step 3 — `Presets.lua` (preset → LR_* settings, TDD) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Presets.lua`
