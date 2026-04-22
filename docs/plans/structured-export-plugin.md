@@ -264,7 +264,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 9 — `ExportTask.lua` (orchestration) + `ContentCredentials.lua`
+### Step 9 — `ExportTask.lua` (orchestration) + `ContentCredentials.lua` ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/ExportTask.lua`
