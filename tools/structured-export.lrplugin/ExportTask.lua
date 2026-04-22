@@ -203,7 +203,7 @@ LrTasks.startAsyncTask(function()
 
     local selection = filterSelection(catalog:getActiveSources())
     if #selection == 0 then
-      LrDialogs.message(NO_SELECTION_MSG)
+      LrDialogs.message('Structured Export', NO_SELECTION_MSG, 'warning')
       return
     end
 
@@ -226,7 +226,7 @@ LrTasks.startAsyncTask(function()
     end
     if #nonEmpty == 0 then
       LrDialogs.message(
-        'The selected collections contain no photos.')
+        'Structured Export', 'The selected collections contain no photos.', 'warning')
       return
     end
 

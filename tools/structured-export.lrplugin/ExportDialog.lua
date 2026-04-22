@@ -1,8 +1,8 @@
-local LrView            = import('LrView')
-local LrBinding         = import('LrBinding')
-local LrDialogs         = import('LrDialogs')
-local LrFunctionContext = import('LrFunctionContext')
-local LrLogger          = import('LrLogger')
+local LrView            = import 'LrView'
+local LrBinding         = import 'LrBinding'
+local LrDialogs         = import 'LrDialogs'
+local LrFunctionContext = import 'LrFunctionContext'
+local LrLogger          = import 'LrLogger'
 
 local Prefs = require('Prefs')
 
