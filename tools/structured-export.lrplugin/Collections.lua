@@ -34,10 +34,10 @@ function Collections.enumerate(selection)
   if not selection or #selection == 0 then return out end
 
   for _, item in ipairs(selection) do
-    if item:type() == 'LrCollectionSet' then
+    if item:type():match('CollectionSet$') then
       walkSet(item, {}, out)
     else
-      -- bare LrCollection
+      -- bare LrCollection or LrPublishedCollection
       out[#out + 1] = {
         collection   = item,
         pathSegments = {},

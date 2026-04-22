@@ -22,6 +22,15 @@ local function fakeSet(name, childSets, childCollections)
   }
 end
 
+local function fakePublishedSet(name, childSets, childCollections)
+  return {
+    type                  = function() return 'LrPublishedCollectionSet' end,
+    getName               = function() return name end,
+    getChildCollectionSets = function() return childSets or {} end,
+    getChildCollections   = function() return childCollections or {} end,
+  }
+end
+
 describe("Collections.enumerate", function()
   it("returns empty list for empty selection", function()
     local result = Collections.enumerate({})
@@ -88,6 +97,16 @@ describe("Collections.enumerate", function()
     assert.equals(2, #result[2].pathSegments)
     assert.equals(Utils.slugify("Top"), result[1].pathSegments[1])
     assert.equals(Utils.slugify("Top"), result[2].pathSegments[1])
+  end)
+
+  it("LrPublishedCollectionSet is treated as a set, not a bare collection", function()
+    local col    = fakeCollection("Published Album", {})
+    local pubSet = fakePublishedSet("Published Set", {}, { col })
+    local result = Collections.enumerate({ pubSet })
+    assert.equals(1, #result)
+    assert.equals(1, #result[1].pathSegments)
+    assert.equals(Utils.slugify("Published Set"), result[1].pathSegments[1])
+    assert.equals(col, result[1].collection)
   end)
 
   it("mixed selection of a set and a bare collection contributes both", function()
