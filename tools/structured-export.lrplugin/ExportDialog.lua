@@ -1,0 +1,134 @@
+local LrView            = import('LrView')
+local LrBinding         = import('LrBinding')
+local LrDialogs         = import('LrDialogs')
+local LrFunctionContext = import('LrFunctionContext')
+
+local Prefs = require('Prefs')
+
+local ExportDialog = {}
+
+function ExportDialog.run(activePhoto)
+  local result = { action = 'cancel', values = {} }
+
+  LrFunctionContext.callWithContext('structuredExportDialog', function(context)
+    local f  = LrView.osFactory()
+    local props = LrBinding.makePropertyTable(context)
+
+    -- Pre-fill from saved prefs
+    local savedPrefs = Prefs.load()
+    props.preset             = savedPrefs.preset or 'print'
+    props.contentCredentials = savedPrefs.contentCredentials
+    props.copyright          = savedPrefs.copyright
+    props.creator            = savedPrefs.creator
+    props.rights             = savedPrefs.rights
+    props.webStatement       = savedPrefs.webStatement
+    props.contactEmail       = savedPrefs.contactEmail
+    props.remember           = false
+
+    -- Override copyright from active photo metadata when available
+    if activePhoto then
+      local photoCopyright = activePhoto:getFormattedMetadata('copyright')
+      if photoCopyright and photoCopyright ~= '' then
+        props.copyright = photoCopyright
+      end
+    end
+
+    local contents = f:column {
+      bind_to_object = props,
+      spacing = f:dialog_spacing(),
+
+      -- Preset radio buttons
+      f:group_box {
+        title = 'Export Preset',
+        f:radio_button {
+          title = 'print',
+          checked_value = 'print',
+          value = LrView.bind('preset'),
+        },
+        f:radio_button {
+          title = 'portfolio',
+          checked_value = 'portfolio',
+          value = LrView.bind('preset'),
+        },
+        f:radio_button {
+          title = 'web',
+          checked_value = 'web',
+          value = LrView.bind('preset'),
+        },
+      },
+
+      -- Content Credentials toggle
+      f:checkbox {
+        title = 'Content Credentials',
+        value = LrView.bind('contentCredentials'),
+      },
+
+      f:separator { fill_horizontal = 1 },
+
+      -- IPTC / copyright fields
+      f:row {
+        f:static_text { title = 'Copyright:', width = 110 },
+        f:edit_field { value = LrView.bind('copyright'), fill_horizontal = 1 },
+      },
+      f:row {
+        f:static_text { title = 'Creator:', width = 110 },
+        f:edit_field { value = LrView.bind('creator'), fill_horizontal = 1 },
+      },
+      f:row {
+        f:static_text { title = 'Rights:', width = 110 },
+        f:edit_field { value = LrView.bind('rights'), fill_horizontal = 1 },
+      },
+      f:row {
+        f:static_text { title = 'Web statement:', width = 110 },
+        f:edit_field { value = LrView.bind('webStatement'), fill_horizontal = 1 },
+      },
+      f:row {
+        f:static_text { title = 'Contact email:', width = 110 },
+        f:edit_field { value = LrView.bind('contactEmail'), fill_horizontal = 1 },
+      },
+
+      f:separator { fill_horizontal = 1 },
+
+      -- Remember checkbox
+      f:checkbox {
+        title = 'Remember these settings',
+        value = LrView.bind('remember'),
+      },
+    }
+
+    local action = LrDialogs.presentModalDialog {
+      title   = 'Structured Export',
+      contents = contents,
+    }
+
+    if action == 'ok' then
+      if props.remember then
+        Prefs.save({
+          preset             = props.preset,
+          contentCredentials = props.contentCredentials,
+          copyright          = props.copyright,
+          creator            = props.creator,
+          rights             = props.rights,
+          webStatement       = props.webStatement,
+          contactEmail       = props.contactEmail,
+        })
+      end
+
+      result.action = 'export'
+      result.values = {
+        preset             = props.preset,
+        contentCredentials = props.contentCredentials,
+        copyright          = props.copyright,
+        creator            = props.creator,
+        rights             = props.rights,
+        webStatement       = props.webStatement,
+        contactEmail       = props.contactEmail,
+        remember           = props.remember,
+      }
+    end
+  end)
+
+  return result
+end
+
+return ExportDialog
