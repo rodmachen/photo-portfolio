@@ -233,14 +233,25 @@ local function runJob(job, preset, values, counts, context, jobIdx, jobTotal)
     -- in the destination folder under their raw camera filenames (e.g.
     -- DSC_7980.jpg) because we never reached the move step for them.
     -- Sweep the folder: delete any .jpg that isn't in the expected
-    -- final-name set for this job.
+    -- final-name set for this job. Sweep multiple times with a short
+    -- sleep between passes: LR's render workers can keep writing files
+    -- to disk after our iterator exits, so a single sweep races the
+    -- queue and leaves late-arriving orphans behind.
     local expected = {}
     for _, dest in pairs(job.dests) do expected[dest] = true end
-    for file in LrFileUtils.files(job.dir) do
-      if not expected[file] and file:lower():match('%.jpe?g$') then
-        logger:info('Removing cancel orphan: ' .. file)
-        LrFileUtils.delete(file)
+    local function sweepOnce()
+      local removed = 0
+      for file in LrFileUtils.files(job.dir) do
+        if not expected[file] and file:lower():match('%.jpe?g$') then
+          logger:info('Removing cancel orphan: ' .. file)
+          if LrFileUtils.delete(file) then removed = removed + 1 end
+        end
       end
+      return removed
+    end
+    for _ = 1, 3 do
+      LrTasks.sleep(1)
+      sweepOnce()
     end
   end
 
