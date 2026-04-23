@@ -2,6 +2,7 @@ local LrView            = import 'LrView'
 local LrBinding         = import 'LrBinding'
 local LrDialogs         = import 'LrDialogs'
 local LrFileUtils       = import 'LrFileUtils'
+local LrPathUtils       = import 'LrPathUtils'
 local LrFunctionContext = import 'LrFunctionContext'
 local LrLogger          = import 'LrLogger'
 
@@ -49,10 +50,19 @@ function ExportDialog.run(activePhoto)
       bind_to_object = props,
       spacing = f:dialog_spacing(),
 
-      -- Destination folder
+      -- Destination folder. Show just the leaf folder name so the label
+      -- stays readable even for deep iCloud paths; full path is in the
+      -- tooltip. Browse is the only way to change it.
       f:row {
         f:static_text { title = 'Destination:', width = 110 },
-        f:edit_field { value = LrView.bind('exportRoot'), fill_horizontal = 1 },
+        f:static_text {
+          title = LrView.bind {
+            key = 'exportRoot',
+            transform = function(value) return LrPathUtils.leafName(value or '') end,
+          },
+          tooltip = LrView.bind('exportRoot'),
+          fill_horizontal = 1,
+        },
         f:push_button {
           title = 'Browse...',
           action = function()
