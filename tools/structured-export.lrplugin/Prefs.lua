@@ -3,7 +3,7 @@ Prefs._prefsProvider = nil  -- test-injection seam
 
 local function provider()
   if Prefs._prefsProvider then return Prefs._prefsProvider() end
-  local LrPrefs = require('LrPrefs')
+  local LrPrefs = import 'LrPrefs'
   return LrPrefs.prefsForPlugin()
 end
 

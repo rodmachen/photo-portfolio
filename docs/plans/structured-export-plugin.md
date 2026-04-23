@@ -274,7 +274,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 1. Resolve active catalog + selected collections. If empty, show error and abort.
 2. Open `ExportDialog.run()`. If cancel, abort.
 3. Call `Collections.enumerate(selection)` to get `{collection, pathSegments, photos}` tuples.
-4. Compute destination paths per photo: `~/Library/Mobile Documents/com~apple~CloudDocs/Photos/<pathSegments...>/<slug(collection)>/<preset>/<filename>`. Use `LrPathUtils.expandPath("~/...")`.
+4. Compute destination paths per photo: `~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<pathSegments...>/<slug(collection)>/<preset>/<filename>`. Resolve the home directory via `LrPathUtils.getStandardFilePath('home')` — `LrPathUtils.expandPath` is not a real SDK function.
 5. Pre-scan disk for collisions. If any, show `LrDialogs.confirm` with Overwrite/Skip/Cancel buttons.
 6. Build the per-preset `LrExportSession` settings: `Presets[preset]` merged with `Metadata.buildExportSettings(prefs)` plus `LR_export_destinationType="specificFolder"`, `LR_export_destinationPathPrefix=<computed>`, `LR_useSubfolder=false`, `LR_renamingTokensOn=true`, `LR_tokens="custom"`, `LR_tokenCustomString=<pre-computed filename>`. Hand each photo explicitly via the session's `photosToExport` parameter.
 7. Conditionally apply `ContentCredentials.apply(settings)` — a separate module that pcall-wraps the key assignment (spec key name is uncertain; try `LR_embedContentCredentials`, fall back to `LR_contentCredentials`, log on failure, never surface to user).
@@ -326,7 +326,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 2. `File → Plug-in Extras → Structured Export` opens the dialog; all five text fields pre-filled per spec defaults.
 3. "Remember these settings" round-trips across a Lightroom restart.
 4. Launching with no collection selected → error dialog with the exact message in the spec.
-5. Single un-nested collection → files land at `~/Library/Mobile Documents/com~apple~CloudDocs/Photos/<slug(collection)>/<preset>/…`.
+5. Single un-nested collection → files land at `~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<slug(collection)>/<preset>/…`.
 6. Collection Set nested ≥2 deep → path segments are lowercase + hyphenated (per Locked Decision #4).
 7. All three presets produce files at spec-correct dimensions — verify with `exiftool -ImageWidth -ImageHeight -XResolution` on a sample file each. Print short-edge 2400 / 300 DPI; Portfolio short-edge 2048 / 240 DPI; Web long-edge 1350 / 72 DPI.
 8. Filename extraction: `DSC_7877.NEF` → `{slug}-7877.jpg`; non-matching filename falls back to Lightroom sequence number.

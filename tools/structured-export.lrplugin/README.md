@@ -37,12 +37,12 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
    - **Remember these settings** — persists current values for the next invocation.
 4. Click **OK** to begin. A progress bar appears; **Cancel** aborts mid-batch cleanly.
-5. On completion a summary reports exported / skipped / error counts. Click **Reveal in Finder** to open the `Photos/` root.
+5. On completion a summary reports exported / skipped / error counts. Click **Reveal in Finder** to open the `iCloud Pictures/` root.
 
 Exported files land at:
 
 ```
-~/Library/Mobile Documents/com~apple~CloudDocs/Photos/<set-slug>/.../<collection-slug>/<preset>/<slug>-<num>.jpg
+~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<set-slug>/.../<collection-slug>/<preset>/<slug>-<num>.jpg
 ```
 
 Folder and filename segments are uniformly lowercase with spaces and underscores converted to hyphens.
@@ -70,7 +70,7 @@ These 15 items must all pass before a release is considered complete.
 2. `File → Plug-in Extras → Structured Export` opens the dialog; all five text fields pre-filled per spec defaults.
 3. "Remember these settings" round-trips across a Lightroom restart.
 4. Launching with no collection selected → error dialog with the exact message in the spec.
-5. Single un-nested collection → files land at `~/Library/Mobile Documents/com~apple~CloudDocs/Photos/<slug(collection)>/<preset>/…`.
+5. Single un-nested collection → files land at `~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<slug(collection)>/<preset>/…`.
 6. Collection Set nested ≥2 deep → path segments are lowercase + hyphenated (per Locked Decision #4).
 7. All three presets produce files at spec-correct dimensions — verify with `exiftool -ImageWidth -ImageHeight -XResolution` on a sample file each. Print short-edge 2400 / 300 DPI; Portfolio short-edge 2048 / 240 DPI; Web long-edge 1350 / 72 DPI.
 8. Filename extraction: `DSC_7877.NEF` → `{slug}-7877.jpg`; non-matching filename falls back to Lightroom sequence number.

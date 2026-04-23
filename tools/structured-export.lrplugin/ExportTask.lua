@@ -19,7 +19,8 @@ local CC           = require 'ContentCredentials'
 local logger = LrLogger('StructuredExport')
 logger:enable('logfile')
 
-local ROOT = LrPathUtils.expandPath('~/Library/Mobile Documents/com~apple~CloudDocs/Photos')
+local ROOT = LrPathUtils.getStandardFilePath('home') ..
+  '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
 
 local NO_SELECTION_MSG =
   'Please select one or more Collections or Collection Sets before running Structured Export.'
