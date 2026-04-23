@@ -74,7 +74,7 @@ Each step ends with a commit. Model/effort is re-evaluated at the start of every
 
 ---
 
-### Step 0 — Repo bootstrap
+### Step 0 — Repo bootstrap ✅
 
 **Files**:
 - `docs/plans/make-a-plan-using-sleepy-whale.md` → rename to `docs/plans/structured-export-plugin.md`
@@ -102,7 +102,7 @@ git checkout -b feature/structured-export-plugin
 
 ---
 
-### Step 1 — Scaffold, test harness, and CI
+### Step 1 — Scaffold, test harness, and CI ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/` (empty dir, placeholder `README.md`)
@@ -174,7 +174,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 4 — `Prefs.lua` (LrPrefs adapter + defaults)
+### Step 4 — `Prefs.lua` (LrPrefs adapter + defaults) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Prefs.lua`
@@ -192,7 +192,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 5 — `Metadata.lua` (builder + exiftool wrapper)
+### Step 5 — `Metadata.lua` (builder + exiftool wrapper) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Metadata.lua`
@@ -212,7 +212,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 6 — `Collections.lua` (recursive walker, TDD)
+### Step 6 — `Collections.lua` (recursive walker, TDD) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Collections.lua`
@@ -230,7 +230,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 7 — `ExportDialog.lua` (LrView modal)
+### Step 7 — `ExportDialog.lua` (LrView modal) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/ExportDialog.lua`
@@ -247,7 +247,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 8 — `Info.lua` (manifest + menu registration)
+### Step 8 — `Info.lua` (manifest + menu registration) ✅
 
 **Files**:
 - `tools/structured-export.lrplugin/Info.lua`
@@ -310,7 +310,7 @@ Commit: "Step 1: scaffold plugin bundle, busted harness, CI workflow".
 
 ---
 
-### Step 11 — Manual end-to-end verification in Lightroom Classic
+### Step 11 — Manual end-to-end verification in Lightroom Classic ✅
 
 **Files**: none (verification only).
 
