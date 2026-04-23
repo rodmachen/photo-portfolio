@@ -13,7 +13,6 @@ describe('Prefs', function()
       assert.are.equal('No use without written permission. To license this image, contact mail@rodmachen.com', d.rights)
       assert.are.equal('https://rodmachen.com/licensing', d.webStatement)
       assert.are.equal('mail@rodmachen.com', d.contactEmail)
-      assert.is_true(d.contentCredentials)
       assert.are.equal('print', d.preset)
     end)
   end)
@@ -37,15 +36,6 @@ describe('Prefs', function()
       Prefs.save({ preset = 'web' })
       local got = Prefs.load()
       assert.are.equal('web', got.preset)
-      Prefs._prefsProvider = nil
-    end)
-
-    it('contentCredentials=false round-trips as false, not default true', function()
-      local fake = {}
-      Prefs._prefsProvider = function() return fake end
-      Prefs.save({ contentCredentials = false })
-      local got = Prefs.load()
-      assert.is_false(got.contentCredentials)
       Prefs._prefsProvider = nil
     end)
 

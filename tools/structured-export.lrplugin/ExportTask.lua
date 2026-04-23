@@ -14,8 +14,6 @@ local Presets      = require 'Presets'
 local Metadata     = require 'Metadata'
 local Collections  = require 'Collections'
 local ExportDialog = require 'ExportDialog'
-local CC           = require 'ContentCredentials'
-
 local logger = LrLogger('StructuredExport')
 logger:enable('logfile')
 
@@ -149,7 +147,6 @@ local function buildSettings(preset, values)
   settings.LR_export_useSubfolder = false
   settings.LR_export_destinationPathSuffix = ''
   settings.LR_renamingTokensOn = false
-  CC.apply(settings, values.contentCredentials)
   return settings
 end
 

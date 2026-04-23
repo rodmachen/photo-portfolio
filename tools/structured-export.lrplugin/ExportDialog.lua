@@ -21,7 +21,6 @@ function ExportDialog.run(activePhoto)
     -- Pre-fill from saved prefs
     local savedPrefs = Prefs.load()
     props.preset             = savedPrefs.preset or 'print'
-    props.contentCredentials = savedPrefs.contentCredentials
     props.copyright          = savedPrefs.copyright
     props.creator            = savedPrefs.creator
     props.rights             = savedPrefs.rights
@@ -59,12 +58,6 @@ function ExportDialog.run(activePhoto)
           checked_value = 'web',
           value = LrView.bind('preset'),
         },
-      },
-
-      -- Content Credentials toggle
-      f:checkbox {
-        title = 'Content Credentials',
-        value = LrView.bind('contentCredentials'),
       },
 
       f:separator { fill_horizontal = 1 },
@@ -114,7 +107,6 @@ function ExportDialog.run(activePhoto)
       if props.remember then
         Prefs.save({
           preset             = props.preset,
-          contentCredentials = props.contentCredentials,
           copyright          = props.copyright,
           creator            = props.creator,
           rights             = props.rights,
@@ -126,7 +118,6 @@ function ExportDialog.run(activePhoto)
       result.action = 'export'
       result.values = {
         preset             = props.preset,
-        contentCredentials = props.contentCredentials,
         copyright          = props.copyright,
         creator            = props.creator,
         rights             = props.rights,

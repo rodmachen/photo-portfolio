@@ -33,7 +33,6 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
 2. Go to **File → Plug-in Extras → Structured Export**.
 3. Configure the dialog:
    - **Export Preset** — `print` (short-edge 2400 px / 300 DPI), `portfolio` (short-edge 2048 px / 240 DPI), or `web` (long-edge 1350 px / 72 DPI).
-   - **Content Credentials** — embed an Adobe Content Credentials manifest (requires LR Classic ≥ 13).
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
    - **Remember these settings** — persists current values for the next invocation.
 4. Click **OK** to begin. A progress bar appears; **Cancel** aborts mid-batch cleanly.
@@ -76,8 +75,7 @@ These 15 items must all pass before a release is considered complete.
 8. Filename extraction: `DSC_7877.NEF` → `{slug}-7877.jpg`; non-matching filename falls back to Lightroom sequence number.
 9. Collision scan: second run of same (collection, preset) surfaces the Overwrite/Skip/Cancel prompt. Each choice behaves per spec; summary counts match.
 10. IPTC fields present in output (`exiftool` check, in one line): `Copyright`, `By-line`, `Rights`, `Credit`, `CreatorWorkEmail` set to `mail@rodmachen.com`, `WebStatement` set to the licensing URL.
-11. Content Credentials: verify the CC manifest via `c2patool verify <file>` on a CC-enabled export; toggle OFF produces no manifest; on SDK that does not support CC the log line appears and export still succeeds.
-12. Progress bar visible mid-export; "Cancel" button stops the run cleanly.
+11. Progress bar visible mid-export; "Cancel" button stops the run cleanly.
 13. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
 14. Summary dialog's "Reveal in Finder" opens `iCloud Pictures/` root.
 15. With `exiftool` removed from PATH: plugin runs, logs warning once, exports succeed but lack the extra IPTC fields.
@@ -114,9 +112,9 @@ brew install exiftool
 
 When exiftool is missing the plugin logs one warning per session and continues — copyright and creator are still embedded natively by Lightroom, but the additional IPTC fields (Credit, Contact Email, Rights, WebStatement) are skipped.
 
-**Content Credentials silently absent**
+**Content Credentials (deferred)**
 
-Content Credentials require Lightroom Classic ≥ 13. On older versions the toggle has no visible effect and no error is raised. Check `StructuredExport.log` for the line `Content Credentials requested (SDK may silently ignore on older versions)` and verify your LR Classic version.
+Content Credentials support has been removed from the UI as of v0.2.0. Adobe has not exposed CC in Lightroom Classic's native export dialog, so the v1 checkbox had no visible effect. CC revival is a known follow-up — see `ContentCredentials.lua` for the re-enablement instructions.
 
 ## Dev
 

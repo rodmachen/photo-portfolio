@@ -15,7 +15,6 @@ function Prefs.getDefaults()
     rights       = 'No use without written permission. To license this image, contact mail@rodmachen.com',
     webStatement = 'https://rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
-    contentCredentials = true,
     preset             = 'print',
     remember           = false,
   }
@@ -37,7 +36,6 @@ function Prefs.load()
     rights       = p.rights       or d.rights,
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
-    contentCredentials = coalesce(p.contentCredentials, d.contentCredentials),
     preset             = p.preset or d.preset,
     remember           = coalesce(p.remember, d.remember),
   }

@@ -269,6 +269,20 @@ When permission is granted, credit should read: **© Rod Machen / rodmachen.com*
 
 ---
 
+## Performance notes
+
+The plugin currently calls `exiftool` once per rendered file (one shell invocation per JPEG). This is the v1 model and is kept in v2 for simplicity.
+
+Approximate threshold at which per-image `exiftool` becomes noticeable:
+- **~200 output files per run**: starts to feel slow (several seconds of shell overhead).
+- **~1000+ output files per run**: adds multiple minutes of shell overhead.
+
+With multi-select presets (v2 Step 3), a 3-preset run multiplies file count by 3 — a 200-photo collection produces 600 `exiftool` invocations.
+
+**Planned migration trigger**: when a real export run feels slow, migrate to batch-per-directory. Replace per-file calls with a single `exiftool -overwrite_original -Copyright=... -Artist=... ... -ext jpg <dir>` call per collection-preset directory, executed after the move/cleanup phase.
+
+---
+
 ## SDK References
 
 - Lightroom Classic SDK documentation: `/Applications/Adobe Lightroom Classic/SDK/`
