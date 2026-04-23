@@ -187,11 +187,11 @@ local function runJob(job, preset, values, counts, context)
         moveOk, moveErr = LrFileUtils.move(pathOrErr, dest)
       end
       if moveOk then
-        local callOk, applyOk, applyErr = pcall(Metadata.applyIptcFields, dest, values)
-        if not callOk then
-          logger:error('applyIptcFields raised: ' .. tostring(applyOk))
-          counts.errors = counts.errors + 1
-        elseif not applyOk then
+        -- Direct call (no pcall): applyIptcFields yields via LrTasks.execute,
+        -- and yielding through plain pcall corrupts the Lightroom task.
+        -- applyIptcFields returns (ok, err) for its anticipated failures.
+        local applyOk, applyErr = Metadata.applyIptcFields(dest, values)
+        if not applyOk then
           logger:error('applyIptcFields failed: ' .. tostring(applyErr))
           counts.errors = counts.errors + 1
         else
@@ -283,15 +283,26 @@ LrTasks.startAsyncTask(function()
       -- 'ok' = Overwrite All: keep jobs unchanged; moves handle overwrite.
     end
 
+    -- pcallWithContext is yield-safe across Lightroom's cooperative tasks;
+    -- plain pcall is not. LrExportSession:renditions() yields internally,
+    -- and yielding through plain pcall triggers
+    -- "AgExportSession:addRenditionsForPhotos: must not call on main UI task".
+    local shouldBreak = false
     for _, job in ipairs(jobs) do
-      local jobOk, jobResult = pcall(runJob, job, preset, values, counts, context)
+      if shouldBreak then break end
+      local jobOk, jobResult = LrFunctionContext.pcallWithContext(
+        'structuredExport:' .. tostring(job.entry.collection:getName()),
+        function(jobContext)
+          return runJob(job, preset, values, counts, jobContext)
+        end
+      )
       if not jobOk then
         logger:error('Job failed for collection ' ..
           tostring(job.entry.collection:getName()) ..
           ': ' .. tostring(jobResult))
         counts.errors = counts.errors + 1
       elseif jobResult then
-        break
+        shouldBreak = true
       end
     end
 

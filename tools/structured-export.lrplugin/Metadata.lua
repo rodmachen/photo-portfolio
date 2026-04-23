@@ -1,6 +1,9 @@
-local ok, LrTasks = pcall(require, 'LrTasks')
-local _okLog, LrLogger = pcall(require, 'LrLogger')
-local logger = _okLog and type(LrLogger) == 'function' and LrLogger('StructuredExport') or nil
+-- SDK namespaces load via the Lightroom-provided global `import`; fall back to
+-- nil when running under plain Lua (busted tests), which makes applyIptcFields
+-- early-return cleanly so pure-logic tests don't need a Lightroom runtime.
+local LrTasks = _G.import and import 'LrTasks' or nil
+local LrLogger = _G.import and import 'LrLogger' or nil
+local logger = LrLogger and LrLogger('StructuredExport') or nil
 
 local Metadata = {}
 
@@ -62,7 +65,7 @@ local _exiftoolWarned = false
 -- Shells out to exiftool to write IPTC fields onto an already-exported file.
 -- Returns ok (bool), err (string or nil).
 function Metadata.applyIptcFields(filePath, prefs)
-  if not ok or not LrTasks then
+  if not LrTasks then
     if logger then logger:error('LrTasks unavailable; IPTC fields skipped') end
     return true, nil  -- graceful degrade when not in LR environment
   end
