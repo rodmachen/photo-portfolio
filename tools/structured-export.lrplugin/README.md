@@ -32,6 +32,7 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
 1. In the Library module, select one or more Collections or Collection Sets in the left panel.
 2. Go to **File → Plug-in Extras → Structured Export**.
 3. Configure the dialog:
+   - **Destination** — the folder where files will be exported. Pre-fills with the iCloud Pictures path by default; click **Browse** to choose a different folder. With Remember enabled, the chosen path persists across sessions.
    - **Export Preset** — `print` (short-edge 2400 px / 300 DPI), `portfolio` (short-edge 2048 px / 240 DPI), or `web` (long-edge 1350 px / 72 DPI).
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
    - **Remember these settings** — persists current values for the next invocation.

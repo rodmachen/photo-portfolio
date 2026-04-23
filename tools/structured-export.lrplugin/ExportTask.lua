@@ -17,9 +17,6 @@ local ExportDialog = require 'ExportDialog'
 local logger = LrLogger('StructuredExport')
 logger:enable('logfile')
 
-local ROOT = LrPathUtils.getStandardFilePath('home') ..
-  '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
-
 local NO_SELECTION_MSG =
   'Please select one or more Collections or Collection Sets before running Structured Export.'
 
@@ -45,10 +42,10 @@ local function filterSelection(sources)
   return out
 end
 
-local function collectionDir(entry)
+local function collectionDir(entry, root)
   local segments = entry.pathSegments or {}
   local collectionSlug = Utils.slugify(entry.collection:getName())
-  local dir = ROOT
+  local dir = root
   for _, seg in ipairs(segments) do
     dir = LrPathUtils.child(dir, seg)
   end
@@ -59,12 +56,12 @@ end
 -- Builds a list of export jobs keyed per-collection-preset. Each entry:
 -- { entry = <collections.enumerate row>, dir = <abs dir>, photos = {photo,...},
 --   dests = { [photo] = <abs file path> } }
-local function buildJobs(entries, preset, fallbackSeqStart)
+local function buildJobs(entries, preset, fallbackSeqStart, root)
   local jobs = {}
   local seq = fallbackSeqStart or 1
   for _, entry in ipairs(entries) do
     local usedDests = {}
-    local baseDir = LrPathUtils.child(collectionDir(entry), preset)
+    local baseDir = LrPathUtils.child(collectionDir(entry, root), preset)
     local job = { entry = entry, dir = baseDir, photos = {}, dests = {} }
     local collectionName = entry.collection:getName()
     for _, photo in ipairs(entry.photos) do
@@ -282,7 +279,7 @@ LrTasks.startAsyncTask(function()
       return
     end
 
-    local jobs = buildJobs(nonEmpty, preset, 1)
+    local jobs = buildJobs(nonEmpty, preset, 1, values.exportRoot)
 
     local counts = { exported = 0, skipped = 0, errors = 0 }
 
@@ -348,7 +345,7 @@ LrTasks.startAsyncTask(function()
       'Reveal in Finder',
       'OK')
     if action == 'ok' then
-      LrShell.revealInShell(ROOT)
+      LrShell.revealInShell(values.exportRoot)
     end
   end)
 end)

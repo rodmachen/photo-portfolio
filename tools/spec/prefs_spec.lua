@@ -5,6 +5,15 @@ local Prefs = require('Prefs')
 
 describe('Prefs', function()
   describe('getDefaults', function()
+    before_each(function()
+      Prefs._pathUtils = function()
+        return { getStandardFilePath = function() return '/Users/testuser' end }
+      end
+    end)
+    after_each(function()
+      Prefs._pathUtils = nil
+    end)
+
     it('returns expected defaults with current year embedded in copyright', function()
       local d = Prefs.getDefaults()
       assert.is_string(d.copyright)
@@ -15,9 +24,25 @@ describe('Prefs', function()
       assert.are.equal('mail@rodmachen.com', d.contactEmail)
       assert.are.equal('print', d.preset)
     end)
+
+    it('exportRoot default is non-empty and ends with iCloud Pictures', function()
+      local d = Prefs.getDefaults()
+      assert.is_string(d.exportRoot)
+      assert.truthy(d.exportRoot ~= '')
+      assert.truthy(d.exportRoot:find('iCloud Pictures', 1, true))
+    end)
   end)
 
   describe('load/save round trip', function()
+    before_each(function()
+      Prefs._pathUtils = function()
+        return { getStandardFilePath = function() return '/Users/testuser' end }
+      end
+    end)
+    after_each(function()
+      Prefs._pathUtils = nil
+    end)
+
     it('save then load returns saved values via injected provider', function()
       local fake = {}
       Prefs._prefsProvider = function() return fake end
@@ -47,6 +72,18 @@ describe('Prefs', function()
       assert.is_true(Prefs.load().remember)
       Prefs.save({ remember = false })
       assert.is_false(Prefs.load().remember)
+      Prefs._prefsProvider = nil
+    end)
+
+    it('exportRoot falls through to default when not saved, overrides when saved', function()
+      local fake = {}
+      Prefs._prefsProvider = function() return fake end
+      local got = Prefs.load()
+      assert.is_string(got.exportRoot)
+      assert.truthy(got.exportRoot:find('iCloud Pictures', 1, true))
+      Prefs.save({ exportRoot = '/tmp/test-export' })
+      got = Prefs.load()
+      assert.are.equal('/tmp/test-export', got.exportRoot)
       Prefs._prefsProvider = nil
     end)
   end)

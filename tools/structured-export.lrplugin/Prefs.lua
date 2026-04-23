@@ -1,5 +1,6 @@
 local Prefs = {}
 Prefs._prefsProvider = nil  -- test-injection seam
+Prefs._pathUtils     = nil  -- test-injection seam
 
 local function provider()
   if Prefs._prefsProvider then return Prefs._prefsProvider() end
@@ -7,14 +8,23 @@ local function provider()
   return LrPrefs.prefsForPlugin()
 end
 
+local function pathUtils()
+  if Prefs._pathUtils then return Prefs._pathUtils() end
+  return import 'LrPathUtils'
+end
+
 function Prefs.getDefaults()
   local year = tostring(os.date('%Y'))
+  local pu = pathUtils()
+  local exportRoot = pu.getStandardFilePath('home') ..
+    '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
   return {
     copyright    = '© ' .. year .. ' Rod Machen. All rights reserved.',
     creator      = 'Rod Machen',
     rights       = 'No use without written permission. To license this image, contact mail@rodmachen.com',
     webStatement = 'https://rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
+    exportRoot         = exportRoot,
     preset             = 'print',
     remember           = false,
   }
@@ -36,6 +46,7 @@ function Prefs.load()
     rights       = p.rights       or d.rights,
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
+    exportRoot         = p.exportRoot or d.exportRoot,
     preset             = p.preset or d.preset,
     remember           = coalesce(p.remember, d.remember),
   }

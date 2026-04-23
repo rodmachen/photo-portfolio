@@ -1,6 +1,7 @@
 local LrView            = import 'LrView'
 local LrBinding         = import 'LrBinding'
 local LrDialogs         = import 'LrDialogs'
+local LrFileUtils       = import 'LrFileUtils'
 local LrFunctionContext = import 'LrFunctionContext'
 local LrLogger          = import 'LrLogger'
 
@@ -20,6 +21,12 @@ function ExportDialog.run(activePhoto)
 
     -- Pre-fill from saved prefs
     local savedPrefs = Prefs.load()
+    -- If stored exportRoot no longer exists on disk, fall back to default silently.
+    local exportRoot = savedPrefs.exportRoot
+    if not LrFileUtils.exists(exportRoot) then
+      exportRoot = Prefs.getDefaults().exportRoot
+    end
+    props.exportRoot         = exportRoot
     props.preset             = savedPrefs.preset or 'print'
     props.copyright          = savedPrefs.copyright
     props.creator            = savedPrefs.creator
@@ -39,6 +46,27 @@ function ExportDialog.run(activePhoto)
     local contents = f:column {
       bind_to_object = props,
       spacing = f:dialog_spacing(),
+
+      -- Destination folder
+      f:row {
+        f:static_text { title = 'Destination:', width = 110 },
+        f:edit_field { value = LrView.bind('exportRoot'), fill_horizontal = 1 },
+        f:push_button {
+          title = 'Browse...',
+          action = function()
+            local picked = LrDialogs.runOpenPanel {
+              title = 'Choose export folder',
+              canChooseFiles = false,
+              canChooseDirectories = true,
+              allowsMultipleSelection = false,
+              initialDirectory = props.exportRoot,
+            }
+            if picked then
+              props.exportRoot = picked[1]
+            end
+          end,
+        },
+      },
 
       -- Preset radio buttons
       f:group_box {
@@ -106,6 +134,7 @@ function ExportDialog.run(activePhoto)
       Prefs.save({ remember = props.remember })
       if props.remember then
         Prefs.save({
+          exportRoot         = props.exportRoot,
           preset             = props.preset,
           copyright          = props.copyright,
           creator            = props.creator,
@@ -117,6 +146,7 @@ function ExportDialog.run(activePhoto)
 
       result.action = 'export'
       result.values = {
+        exportRoot         = props.exportRoot,
         preset             = props.preset,
         copyright          = props.copyright,
         creator            = props.creator,
