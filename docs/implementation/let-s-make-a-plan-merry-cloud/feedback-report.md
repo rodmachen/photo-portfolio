@@ -58,5 +58,5 @@ None.
 
 - Busted: pass — 94 successes / 0 failures / 0 errors
 - Luacheck: pass — 0 warnings / 0 errors in 16 files
-- Commit: (see below after commit)
+- Commit: 8e1c763
 - PR description updated: yes
