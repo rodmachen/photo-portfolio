@@ -64,8 +64,8 @@ end
 local function buildJobs(entries, preset, fallbackSeqStart)
   local jobs = {}
   local seq = fallbackSeqStart or 1
-  local usedDests = {}
   for _, entry in ipairs(entries) do
+    local usedDests = {}
     local baseDir = LrPathUtils.child(collectionDir(entry), preset)
     local job = { entry = entry, dir = baseDir, photos = {}, dests = {} }
     local collectionName = entry.collection:getName()
@@ -78,6 +78,7 @@ local function buildJobs(entries, preset, fallbackSeqStart)
       seq = seq + 1
       local dest = LrPathUtils.child(baseDir, filename)
       if usedDests[dest] then
+        -- LR_format=JPEG guarantees a lowercase .jpg extension here.
         local stem = dest:match('^(.+)%.jpg$') or dest
         local n = 2
         local candidate = stem .. '-' .. n .. '.jpg'
@@ -185,6 +186,8 @@ local function runJob(job, preset, values, counts, context)
         logger:info('Export canceled by user')
       end
       rendition:renditionIsDone(false, 'Canceled by user')
+      done = done + 1
+      progress:setPortionComplete(done, total)
     else
       local ok, pathOrErr = rendition:waitForRender()
       if ok then

@@ -79,7 +79,7 @@ These 15 items must all pass before a release is considered complete.
 11. Content Credentials: verify the CC manifest via `c2patool verify <file>` on a CC-enabled export; toggle OFF produces no manifest; on SDK that does not support CC the log line appears and export still succeeds.
 12. Progress bar visible mid-export; "Cancel" button stops the run cleanly.
 13. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
-14. Summary dialog's "Reveal in Finder" opens `Photos/` root.
+14. Summary dialog's "Reveal in Finder" opens `iCloud Pictures/` root.
 15. With `exiftool` removed from PATH: plugin runs, logs warning once, exports succeed but lack the extra IPTC fields.
 
 ## Troubleshooting
@@ -105,7 +105,6 @@ The plugin probes in this order:
 1. `/opt/homebrew/bin/exiftool`
 2. `/usr/local/bin/exiftool`
 3. `/usr/bin/exiftool`
-4. bare `exiftool` on PATH (last resort)
 
 Install via Homebrew to satisfy probe #1:
 

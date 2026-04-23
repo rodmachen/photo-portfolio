@@ -1,5 +1,3 @@
-local ok, LrPathUtils = pcall(require, 'LrPathUtils')
-
 local Utils = {}
 
 function Utils.slugify(s)
@@ -26,23 +24,6 @@ function Utils.extractFileNumber(filename)
   -- Fall back to all-numeric basename (e.g. 123.NEF)
   if basename:match("^%d+$") then return basename end
   return nil
-end
-
-function Utils.joinPath(...)
-  local parts = {...}
-  if #parts == 0 then return "" end
-  if ok and LrPathUtils then
-    local result = parts[1]
-    for i = 2, #parts do
-      result = LrPathUtils.child(result, parts[i])
-    end
-    return result
-  end
-  local cleaned = {}
-  for _, p in ipairs(parts) do
-    cleaned[#cleaned + 1] = (p:gsub("/$", ""))
-  end
-  return table.concat(cleaned, "/")
 end
 
 function Utils.buildCollectionFilename(collectionName, fileNumber, fallbackSeq)

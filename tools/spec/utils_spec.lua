@@ -108,24 +108,6 @@ describe("Utils.extractFileNumber", function()
   end)
 end)
 
-describe("Utils.joinPath", function()
-  it("joins two segments with a slash", function()
-    assert.equals("foo/bar", Utils.joinPath("foo", "bar"))
-  end)
-
-  it("joins three segments", function()
-    assert.equals("foo/bar/baz", Utils.joinPath("foo", "bar", "baz"))
-  end)
-
-  it("single argument returns the argument", function()
-    assert.equals("foo", Utils.joinPath("foo"))
-  end)
-
-  it("strips trailing slashes from segments before joining", function()
-    assert.equals("foo/bar", Utils.joinPath("foo/", "bar"))
-  end)
-end)
-
 describe("Utils.buildCollectionFilename", function()
   it("uses fileNumber when provided", function()
     assert.equals("my-collection-7877.jpg", Utils.buildCollectionFilename("My Collection", "7877", 1))

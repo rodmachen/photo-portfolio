@@ -11,10 +11,4 @@ return {
       file  = 'ExportTask.lua',
     },
   },
-  LrExportMenuItems = {
-    {
-      title = 'Structured Export',
-      file  = 'ExportTask.lua',
-    },
-  },
 }
