@@ -63,6 +63,7 @@ end
 local function buildJobs(entries, preset, fallbackSeqStart)
   local jobs = {}
   local seq = fallbackSeqStart or 1
+  local usedDests = {}
   for _, entry in ipairs(entries) do
     local baseDir = LrPathUtils.child(collectionDir(entry), preset)
     local job = { entry = entry, dir = baseDir, photos = {}, dests = {} }
@@ -75,6 +76,17 @@ local function buildJobs(entries, preset, fallbackSeqStart)
       )
       seq = seq + 1
       local dest = LrPathUtils.child(baseDir, filename)
+      if usedDests[dest] then
+        local stem = dest:match('^(.+)%.jpg$') or dest
+        local n = 2
+        local candidate = stem .. '-' .. n .. '.jpg'
+        while usedDests[candidate] do
+          n = n + 1
+          candidate = stem .. '-' .. n .. '.jpg'
+        end
+        dest = candidate
+      end
+      usedDests[dest] = true
       job.photos[#job.photos + 1] = photo
       job.dests[photo] = dest
     end
@@ -152,9 +164,11 @@ local function runJob(job, preset, values, counts, context)
 
   local total = #job.photos
   local done = 0
+  local canceled = false
 
   for _, rendition in session:renditions() do
     if progress:isCanceled() then
+      canceled = true
       logger:info('Export canceled by user')
       break
     end
@@ -172,11 +186,16 @@ local function runJob(job, preset, values, counts, context)
         moveOk, moveErr = LrFileUtils.move(pathOrErr, dest)
       end
       if moveOk then
-        local iptcOk, iptcErr = pcall(Metadata.applyIptcFields, dest, values)
-        if not iptcOk then
-          logger:error('applyIptcFields raised: ' .. tostring(iptcErr))
+        local callOk, applyOk, applyErr = pcall(Metadata.applyIptcFields, dest, values)
+        if not callOk then
+          logger:error('applyIptcFields raised: ' .. tostring(applyOk))
+          counts.errors = counts.errors + 1
+        elseif not applyOk then
+          logger:error('applyIptcFields failed: ' .. tostring(applyErr))
+          counts.errors = counts.errors + 1
+        else
+          counts.exported = counts.exported + 1
         end
-        counts.exported = counts.exported + 1
       else
         logger:error(string.format(
           'Failed to move %s -> %s: %s',
@@ -195,6 +214,7 @@ local function runJob(job, preset, values, counts, context)
   end
 
   progress:done()
+  return canceled
 end
 
 LrTasks.startAsyncTask(function()
@@ -253,8 +273,9 @@ LrTasks.startAsyncTask(function()
         counts.skipped = skippedCount
         if #jobs == 0 then
           LrDialogs.message(
-            'All selected files already exist. Nothing to export.',
-            string.format('%d skipped.', counts.skipped))
+            'Structured Export',
+            string.format('All selected files already exist. Nothing to export. %d skipped.', counts.skipped),
+            'info')
           return
         end
       end
@@ -262,12 +283,14 @@ LrTasks.startAsyncTask(function()
     end
 
     for _, job in ipairs(jobs) do
-      local jobOk, jobErr = pcall(runJob, job, preset, values, counts, context)
+      local jobOk, jobResult = pcall(runJob, job, preset, values, counts, context)
       if not jobOk then
         logger:error('Job failed for collection ' ..
           tostring(job.entry.collection:getName()) ..
-          ': ' .. tostring(jobErr))
+          ': ' .. tostring(jobResult))
         counts.errors = counts.errors + 1
+      elseif jobResult then
+        break
       end
     end
 

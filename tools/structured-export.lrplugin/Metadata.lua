@@ -32,7 +32,6 @@ local function resolveExiftool()
       end
     end
   end
-  _exiftoolPath = nil
   return nil
 end
 
@@ -84,7 +83,7 @@ function Metadata.applyIptcFields(filePath, prefs)
     '-By-line='       .. shellEscape(prefs.creator      or ''),
     '-Rights='        .. shellEscape(prefs.rights       or ''),
     '-Credit='        .. shellEscape(prefs.creator      or ''),
-    '-ContactCiEmailWork=' .. shellEscape(prefs.contactEmail  or ''),
+    '-CreatorWorkEmail='   .. shellEscape(prefs.contactEmail  or ''),
     '-WebStatement='  .. shellEscape(prefs.webStatement or ''),
     shellEscape(filePath),
   }, ' ')

@@ -75,7 +75,7 @@ These 15 items must all pass before a release is considered complete.
 7. All three presets produce files at spec-correct dimensions — verify with `exiftool -ImageWidth -ImageHeight -XResolution` on a sample file each. Print short-edge 2400 / 300 DPI; Portfolio short-edge 2048 / 240 DPI; Web long-edge 1350 / 72 DPI.
 8. Filename extraction: `DSC_7877.NEF` → `{slug}-7877.jpg`; non-matching filename falls back to Lightroom sequence number.
 9. Collision scan: second run of same (collection, preset) surfaces the Overwrite/Skip/Cancel prompt. Each choice behaves per spec; summary counts match.
-10. IPTC fields present in output (`exiftool` check, in one line): `Copyright`, `By-line`, `Rights`, `Credit`, `Contact/CiEmailWork` set to `mail@rodmachen.com`, `WebStatement` set to the licensing URL.
+10. IPTC fields present in output (`exiftool` check, in one line): `Copyright`, `By-line`, `Rights`, `Credit`, `CreatorWorkEmail` set to `mail@rodmachen.com`, `WebStatement` set to the licensing URL.
 11. Content Credentials: verify the CC manifest via `c2patool verify <file>` on a CC-enabled export; toggle OFF produces no manifest; on SDK that does not support CC the log line appears and export still succeeds.
 12. Progress bar visible mid-export; "Cancel" button stops the run cleanly.
 13. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
