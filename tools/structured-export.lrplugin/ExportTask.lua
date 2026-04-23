@@ -174,53 +174,78 @@ local function runJob(job, preset, values, counts, context)
   local canceled = false
 
   for _, rendition in session:renditions() do
-    if progress:isCanceled() then
-      canceled = true
-      logger:info('Export canceled by user')
-      break
-    end
-
-    local ok, pathOrErr = rendition:waitForRender()
-    if ok then
-      local dest = job.dests[rendition.photo]
-      local moveOk, moveErr = true, nil
-      if pathOrErr ~= dest then
-        -- Overwrite: remove any existing file at dest first, since
-        -- LrFileUtils.move does not overwrite.
-        if LrFileUtils.exists(dest) then
-          pcall(function() LrFileUtils.delete(dest) end)
-        end
-        moveOk, moveErr = LrFileUtils.move(pathOrErr, dest)
+    if canceled or progress:isCanceled() then
+      -- Don't break — Lightroom renders photos in parallel ahead of our
+      -- iterator, and breaking leaves its render queue draining onto disk
+      -- as raw-named orphans. Instead, fully consume the iterator and mark
+      -- each remaining rendition done-with-failure so Lightroom abandons
+      -- the rest of the queue.
+      if not canceled then
+        canceled = true
+        logger:info('Export canceled by user')
       end
-      if moveOk then
-        -- Direct call (no pcall): applyIptcFields yields via LrTasks.execute,
-        -- and yielding through plain pcall corrupts the Lightroom task.
-        -- applyIptcFields returns (ok, err) for its anticipated failures.
-        local applyOk, applyErr = Metadata.applyIptcFields(dest, values)
-        if not applyOk then
-          logger:error('applyIptcFields failed: ' .. tostring(applyErr))
-          counts.errors = counts.errors + 1
+      rendition:renditionIsDone(false, 'Canceled by user')
+    else
+      local ok, pathOrErr = rendition:waitForRender()
+      if ok then
+        local dest = job.dests[rendition.photo]
+        local moveOk, moveErr = true, nil
+        if pathOrErr ~= dest then
+          -- Overwrite: remove any existing file at dest first, since
+          -- LrFileUtils.move does not overwrite.
+          if LrFileUtils.exists(dest) then
+            pcall(function() LrFileUtils.delete(dest) end)
+          end
+          moveOk, moveErr = LrFileUtils.move(pathOrErr, dest)
+        end
+        if moveOk then
+          -- Direct call (no pcall): applyIptcFields yields via LrTasks.execute,
+          -- and yielding through plain pcall corrupts the Lightroom task.
+          -- applyIptcFields returns (ok, err) for its anticipated failures.
+          local applyOk, applyErr = Metadata.applyIptcFields(dest, values)
+          if not applyOk then
+            logger:error('applyIptcFields failed: ' .. tostring(applyErr))
+            counts.errors = counts.errors + 1
+          else
+            counts.exported = counts.exported + 1
+          end
         else
-          counts.exported = counts.exported + 1
+          logger:error(string.format(
+            'Failed to move %s -> %s: %s',
+            tostring(pathOrErr), tostring(dest), tostring(moveErr)))
+          counts.errors = counts.errors + 1
         end
       else
-        logger:error(string.format(
-          'Failed to move %s -> %s: %s',
-          tostring(pathOrErr), tostring(dest), tostring(moveErr)))
+        logger:error('Render failed for ' ..
+          tostring(rendition.photo and rendition.photo.localIdentifier or '?') ..
+          ': ' .. tostring(pathOrErr))
         counts.errors = counts.errors + 1
       end
-    else
-      logger:error('Render failed for ' ..
-        tostring(rendition.photo and rendition.photo.localIdentifier or '?') ..
-        ': ' .. tostring(pathOrErr))
-      counts.errors = counts.errors + 1
-    end
 
-    done = done + 1
-    progress:setPortionComplete(done, total)
+      done = done + 1
+      progress:setPortionComplete(done, total)
+    end
   end
 
   progress:done()
+
+  if canceled then
+    -- Some photos may have been rendered by Lightroom (in parallel, ahead
+    -- of our iterator) before we saw the cancel signal. Those files sit
+    -- in the destination folder under their raw camera filenames (e.g.
+    -- DSC_7980.jpg) because we never reached the move step for them.
+    -- Sweep the folder: delete any .jpg that isn't in the expected
+    -- final-name set for this job.
+    local expected = {}
+    for _, dest in pairs(job.dests) do expected[dest] = true end
+    for file in LrFileUtils.files(job.dir) do
+      if not expected[file] and file:lower():match('%.jpe?g$') then
+        logger:info('Removing cancel orphan: ' .. file)
+        LrFileUtils.delete(file)
+      end
+    end
+  end
+
   return canceled
 end
 
