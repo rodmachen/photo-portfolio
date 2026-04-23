@@ -12,27 +12,22 @@ local _exiftoolPath = false  -- false = not yet resolved; nil = not found
 
 local function resolveExiftool()
   if _exiftoolPath ~= false then return _exiftoolPath end
+  -- Probe known absolute paths only. A bare `exiftool` fallback via PATH
+  -- lookup is unreachable from inside Lightroom anyway — macOS GUI apps
+  -- launch with a minimal PATH that does not include Homebrew. (Also,
+  -- `os.execute` is nil in Lightroom's sandboxed Lua, so the PATH probe
+  -- would crash before ever returning a result.)
   local candidates = {
     '/opt/homebrew/bin/exiftool',
     '/usr/local/bin/exiftool',
     '/usr/bin/exiftool',
-    'exiftool',
   }
   for _, path in ipairs(candidates) do
-    if path == 'exiftool' then
-      -- bare command: probe via shell without touching io.open
-      local ok2 = os.execute('command -v exiftool > /dev/null 2>&1')
-      if ok2 == 0 or ok2 == true then
-        _exiftoolPath = path
-        return _exiftoolPath
-      end
-    else
-      local f = io.open(path, 'r')
-      if f then
-        f:close()
-        _exiftoolPath = path
-        return _exiftoolPath
-      end
+    local f = io.open(path, 'r')
+    if f then
+      f:close()
+      _exiftoolPath = path
+      return _exiftoolPath
     end
   end
   return nil
