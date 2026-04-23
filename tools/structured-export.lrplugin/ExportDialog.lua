@@ -23,7 +23,7 @@ function ExportDialog.run(activePhoto)
     local savedPrefs = Prefs.load()
     -- If stored exportRoot no longer exists on disk, fall back to default silently.
     local exportRoot = savedPrefs.exportRoot
-    if not LrFileUtils.exists(exportRoot) then
+    if LrFileUtils.exists(exportRoot) ~= 'directory' then
       exportRoot = Prefs.getDefaults().exportRoot
     end
     props.exportRoot         = exportRoot
@@ -35,7 +35,7 @@ function ExportDialog.run(activePhoto)
     props.rights             = savedPrefs.rights
     props.webStatement       = savedPrefs.webStatement
     props.contactEmail       = savedPrefs.contactEmail
-    props.remember           = savedPrefs.remember or false
+    props.remember           = savedPrefs.remember
 
     -- Override copyright from active photo metadata when available
     if activePhoto then
@@ -164,7 +164,6 @@ function ExportDialog.run(activePhoto)
         rights             = props.rights,
         webStatement       = props.webStatement,
         contactEmail       = props.contactEmail,
-        remember           = props.remember,
       }
     end
   end)

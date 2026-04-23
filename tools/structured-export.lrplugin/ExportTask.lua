@@ -276,12 +276,7 @@ LrTasks.startAsyncTask(function()
     if values.presetWeb then
       selectedPresets[#selectedPresets + 1] = 'web'
     end
-    if #selectedPresets == 0 then
-      -- Dialog validation should catch this; defensive fallback.
-      LrDialogs.message(
-        'Structured Export', 'Select at least one preset.', 'warning')
-      return
-    end
+    assert(#selectedPresets > 0, 'dialog must validate preset selection')
 
     local entries = Collections.enumerate(selection)
     -- Keep only entries that have at least one photo.

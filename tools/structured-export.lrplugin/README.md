@@ -37,12 +37,12 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
    - **Remember these settings** — persists current values for the next invocation.
 4. Click **OK** to begin. A progress bar appears; **Cancel** aborts mid-batch cleanly.
-5. On completion a summary reports exported / skipped / error counts. Click **Reveal in Finder** to open the `iCloud Pictures/` root.
+5. On completion a summary reports exported / skipped / error counts. Click **Reveal in Finder** to open the chosen Destination root.
 
 Exported files land at:
 
 ```
-~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<set-slug>/.../<collection-slug>/<preset>/<slug>-<num>.jpg
+<Destination>/<set-slug>/.../<collection-slug>/<preset>/<slug>-<num>.jpg
 ```
 
 Folder and filename segments are uniformly lowercase with spaces and underscores converted to hyphens.
@@ -64,22 +64,22 @@ The shortcut fires the item registered under **File → Plug-in Extras**.
 
 ## Manual test checklist
 
-These 15 items must all pass before a release is considered complete.
+These 14 items must all pass before a release is considered complete.
 
 1. Plug-in Manager shows "Structured Export" as enabled, no Info.lua errors.
 2. `File → Plug-in Extras → Structured Export` opens the dialog; all five text fields pre-filled per spec defaults.
 3. "Remember these settings" round-trips across a Lightroom restart.
 4. Launching with no collection selected → error dialog with the exact message in the spec.
-5. Single un-nested collection → files land at `~/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures/<slug(collection)>/<preset>/…`.
+5. Single un-nested collection → files land at `<Destination>/<slug(collection)>/<preset>/…`.
 6. Collection Set nested ≥2 deep → path segments are lowercase + hyphenated (per Locked Decision #4).
 7. All three presets produce files at spec-correct dimensions — verify with `exiftool -ImageWidth -ImageHeight -XResolution` on a sample file each. Print short-edge 2400 / 300 DPI; Portfolio short-edge 2048 / 240 DPI; Web long-edge 1350 / 72 DPI.
 8. Filename extraction: `DSC_7877.NEF` → `{slug}-7877.jpg`; non-matching filename falls back to Lightroom sequence number.
-9. Collision scan: second run of same (collection, preset) surfaces the Overwrite/Skip/Cancel prompt. Each choice behaves per spec; summary counts match.
+9. Collision scan: second run of same (collection, preset) surfaces the Overwrite/Skip/Cancel prompt. Each choice behaves per spec; summary counts match. With two or more presets selected and collisions in each, the prompt fires once; the chosen strategy applies uniformly to all preset folders.
 10. IPTC fields present in output (`exiftool` check, in one line): `Copyright`, `By-line`, `Rights`, `Credit`, `CreatorWorkEmail` set to `mail@rodmachen.com`, `WebStatement` set to the licensing URL.
 11. Progress bar visible mid-export; "Cancel" button stops the run cleanly.
-13. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
-14. Summary dialog's "Reveal in Finder" opens `iCloud Pictures/` root.
-15. With `exiftool` removed from PATH: plugin runs, logs warning once, exports succeed but lack the extra IPTC fields.
+12. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
+13. Summary dialog's "Reveal in Finder" opens the chosen Destination root.
+14. With `exiftool` removed from PATH: plugin runs, logs warning once, exports succeed but lack the extra IPTC fields.
 
 ## Troubleshooting
 

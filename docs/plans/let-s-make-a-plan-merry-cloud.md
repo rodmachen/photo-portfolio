@@ -54,7 +54,7 @@ Each step ends with a commit on `feature/structured-export-v2`. Re-evaluate mode
 
 ---
 
-### Step 0 — Branch setup
+### Step 0 — Branch setup ✅
 
 **Files**: none (git state only).
 
@@ -70,7 +70,7 @@ Each step ends with a commit on `feature/structured-export-v2`. Re-evaluate mode
 
 ---
 
-### Step 1 — Remove Content Credentials from UI, bump version, document EXIF threshold
+### Step 1 — Remove Content Credentials from UI, bump version, document EXIF threshold ✅
 
 Single commit bundling cleanup that doesn't change export behavior.
 
@@ -99,7 +99,7 @@ Single commit bundling cleanup that doesn't change export behavior.
 
 ---
 
-### Step 2 — Add folder picker to dialog
+### Step 2 — Add folder picker to dialog ✅
 
 The hardcoded `ROOT` constant in `ExportTask.lua` becomes a configurable value that flows through the dialog.
 
