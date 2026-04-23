@@ -240,14 +240,12 @@ local function runJob(job, preset, values, counts, context, jobIdx, jobTotal)
     local expected = {}
     for _, dest in pairs(job.dests) do expected[dest] = true end
     local function sweepOnce()
-      local removed = 0
       for file in LrFileUtils.files(job.dir) do
         if not expected[file] and file:lower():match('%.jpe?g$') then
           logger:info('Removing cancel orphan: ' .. file)
-          if LrFileUtils.delete(file) then removed = removed + 1 end
+          LrFileUtils.delete(file)
         end
       end
-      return removed
     end
     for _ = 1, 3 do
       LrTasks.sleep(1)
@@ -287,7 +285,10 @@ LrTasks.startAsyncTask(function()
     if values.presetWeb then
       selectedPresets[#selectedPresets + 1] = 'web'
     end
-    assert(#selectedPresets > 0, 'dialog must validate preset selection')
+    if #selectedPresets == 0 then
+      logger:error('No presets selected — dialog validation should prevent this')
+      return
+    end
 
     local entries = Collections.enumerate(selection)
     -- Keep only entries that have at least one photo.

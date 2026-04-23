@@ -58,6 +58,7 @@ end
 
 function Prefs.save(values)
   local p = provider()
+  -- pairs skips nil values — save({ key = nil }) is a no-op, not a reset.
   for k, v in pairs(values) do p[k] = v end
 end
 

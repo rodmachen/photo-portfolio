@@ -24,7 +24,7 @@ function ExportDialog.run(activePhoto)
     local savedPrefs = Prefs.load()
     -- If stored exportRoot no longer exists on disk, fall back to default silently.
     local exportRoot = savedPrefs.exportRoot
-    if LrFileUtils.exists(exportRoot) ~= 'directory' then
+    if not exportRoot or exportRoot == '' or LrFileUtils.exists(exportRoot) ~= 'directory' then
       exportRoot = Prefs.getDefaults().exportRoot
     end
     props.exportRoot         = exportRoot
