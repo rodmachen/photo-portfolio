@@ -140,7 +140,13 @@ local function buildSettings(preset, values)
     settings[k] = v
   end
   settings.LR_export_destinationType = 'specificFolder'
+  -- Disable subfolder across both the legacy and LR_export_-prefixed keys,
+  -- and clear any lingering path suffix — without these, Lightroom renders
+  -- files under an "Untitled Export" subfolder that we then move out of,
+  -- leaving the empty dir behind.
   settings.LR_useSubfolder = false
+  settings.LR_export_useSubfolder = false
+  settings.LR_export_destinationPathSuffix = ''
   settings.LR_renamingTokensOn = false
   CC.apply(settings, values.contentCredentials)
   return settings

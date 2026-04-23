@@ -79,15 +79,21 @@ function Metadata.applyIptcFields(filePath, prefs)
     return true, nil
   end
 
+  -- Creator is written across three namespaces so it shows up regardless of
+  -- what the reader consults: EXIF IFD0 Artist (Finder Preview, macOS Photos),
+  -- XMP dc:Creator (Bridge, modern catalogers), IPTC By-line + Credit (legacy
+  -- photo workflows).
   local cmd = table.concat({
     bin,
     '-overwrite_original',
-    '-Copyright='     .. shellEscape(prefs.copyright    or ''),
-    '-By-line='       .. shellEscape(prefs.creator      or ''),
-    '-Rights='        .. shellEscape(prefs.rights       or ''),
-    '-Credit='        .. shellEscape(prefs.creator      or ''),
-    '-CreatorWorkEmail='   .. shellEscape(prefs.contactEmail  or ''),
-    '-WebStatement='  .. shellEscape(prefs.webStatement or ''),
+    '-Copyright='        .. shellEscape(prefs.copyright    or ''),
+    '-Artist='           .. shellEscape(prefs.creator      or ''),
+    '-XMP:Creator='      .. shellEscape(prefs.creator      or ''),
+    '-By-line='          .. shellEscape(prefs.creator      or ''),
+    '-Credit='           .. shellEscape(prefs.creator      or ''),
+    '-Rights='           .. shellEscape(prefs.rights       or ''),
+    '-CreatorWorkEmail=' .. shellEscape(prefs.contactEmail or ''),
+    '-WebStatement='     .. shellEscape(prefs.webStatement or ''),
     shellEscape(filePath),
   }, ' ')
 
