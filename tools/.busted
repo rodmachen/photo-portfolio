@@ -1,0 +1,7 @@
+return {
+  default = {
+    ROOT = {'spec'},
+    helper = 'spec/spec_helper.lua',
+    pattern = '_spec%.lua$',
+  },
+}
