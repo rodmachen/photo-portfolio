@@ -124,7 +124,7 @@ The hardcoded `ROOT` constant in `ExportTask.lua` becomes a configurable value t
 
 ---
 
-### Step 3 — Multi-select presets
+### Step 3 — Multi-select presets ✅
 
 Replace the three radio buttons with three checkboxes, validate at least one is selected, and iterate the export pipeline once per selected preset.
 

@@ -25,7 +25,9 @@ function Prefs.getDefaults()
     webStatement = 'https://rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
     exportRoot         = exportRoot,
-    preset             = 'print',
+    presetPrint        = true,
+    presetPortfolio    = false,
+    presetWeb          = false,
     remember           = false,
   }
 end
@@ -47,7 +49,9 @@ function Prefs.load()
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
     exportRoot         = p.exportRoot or d.exportRoot,
-    preset             = p.preset or d.preset,
+    presetPrint        = coalesce(p.presetPrint, d.presetPrint),
+    presetPortfolio    = coalesce(p.presetPortfolio, d.presetPortfolio),
+    presetWeb          = coalesce(p.presetWeb, d.presetWeb),
     remember           = coalesce(p.remember, d.remember),
   }
 end

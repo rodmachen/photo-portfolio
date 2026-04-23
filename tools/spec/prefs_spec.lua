@@ -22,7 +22,14 @@ describe('Prefs', function()
       assert.are.equal('No use without written permission. To license this image, contact mail@rodmachen.com', d.rights)
       assert.are.equal('https://rodmachen.com/licensing', d.webStatement)
       assert.are.equal('mail@rodmachen.com', d.contactEmail)
-      assert.are.equal('print', d.preset)
+    end)
+
+    it('preset booleans default to print-only', function()
+      local d = Prefs.getDefaults()
+      assert.is_true(d.presetPrint)
+      assert.is_false(d.presetPortfolio)
+      assert.is_false(d.presetWeb)
+      assert.is_nil(d.preset)
     end)
 
     it('exportRoot default is non-empty and ends with iCloud Pictures', function()
@@ -55,12 +62,25 @@ describe('Prefs', function()
       Prefs._prefsProvider = nil
     end)
 
-    it('preset round-trips correctly', function()
+    it('preset booleans round-trip true and false independently', function()
       local fake = {}
       Prefs._prefsProvider = function() return fake end
-      Prefs.save({ preset = 'web' })
       local got = Prefs.load()
-      assert.are.equal('web', got.preset)
+      assert.is_true(got.presetPrint)
+      assert.is_false(got.presetPortfolio)
+      assert.is_false(got.presetWeb)
+
+      Prefs.save({ presetPrint = false, presetPortfolio = true, presetWeb = true })
+      got = Prefs.load()
+      assert.is_false(got.presetPrint)
+      assert.is_true(got.presetPortfolio)
+      assert.is_true(got.presetWeb)
+
+      Prefs.save({ presetPrint = true, presetPortfolio = false, presetWeb = false })
+      got = Prefs.load()
+      assert.is_true(got.presetPrint)
+      assert.is_false(got.presetPortfolio)
+      assert.is_false(got.presetWeb)
       Prefs._prefsProvider = nil
     end)
 

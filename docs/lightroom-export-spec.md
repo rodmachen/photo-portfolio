@@ -16,12 +16,14 @@ The plugin should appear in **File → Plugin Extras** as **"Structured Export"*
 
 When triggered, show a modal dialog with:
 
-1. **Preset selector** — radio buttons or dropdown:
+1. **Preset selector** — three checkboxes (multi-select; at least one required):
    - `print`
    - `portfolio`
    - `web`
 
-2. **Content Credentials toggle** — checkbox, default ON.
+   Each selected preset runs as an independent pass against the same collection selection. Output directories per preset are independent, so the passes never collide with one another. Fixed execution order is `print`, `portfolio`, `web`.
+
+2. **Content Credentials toggle** — *removed as of v0.2.0. Placeholder preserved for a future revival; see `ContentCredentials.lua` header for re-enablement steps.*
 
 3. **Copyright fields** (pre-filled from stored prefs, editable):
    - Copyright string — default: `© {current_year} Rod Machen. All rights reserved.`
@@ -164,17 +166,18 @@ If collisions are found, show a pre-export dialog:
 > `Cancel` — Abort the export.
 
 Rules:
-- The collision check must cover all three preset subfolders (`print`, `portfolio`, `web`) for the selected preset being exported, not all presets at once.
+- The collision pre-scan runs once across every selected preset's output directory before the first export pass begins. A single user prompt handles the aggregated collision count; the chosen strategy (Overwrite All / Skip Existing / Cancel) applies uniformly to all selected presets.
 - Log all skipped files by filename to the Lightroom log.
-- The summary dialog on completion should reflect the choice: e.g. `"Export complete. 42 exported, 8 skipped (already existed), 0 errors."`
+- The summary dialog on completion reflects the cumulative totals across all selected presets: e.g. `"Export complete. 42 exported, 8 skipped (already existed), 0 errors."`
 
 ---
 
 ## Progress & Error Handling
 
-- Show a Lightroom-native progress bar during export (`LrProgressScope`).
+- Show a Lightroom-native progress bar during export (`LrProgressScope`). The per-job title format is `"Structured Export: <collection> (<preset> — <i> of <N>)"`, where `N` is the number of jobs in the current preset pass.
 - If an individual photo fails to export, log the filename and error, skip it, and continue — do not abort the entire batch.
-- On completion, show a summary dialog: `"Export complete. X photos exported to [path]. Y errors."` with an option to open the output folder in Finder.
+- Cancel semantics: canceling mid-export breaks both the inner per-job loop and the outer preset loop. The per-job orphan cleanup handles files Lightroom may have rendered in parallel ahead of the iterator; no additional cleanup sweep runs at the outer level.
+- On completion, show a summary dialog: `"Export complete. X photos exported to [path]. Y errors."` with an option to open the output folder in Finder. Counts are cumulative across all selected preset passes.
 
 ---
 

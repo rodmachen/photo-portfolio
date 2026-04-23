@@ -27,7 +27,9 @@ function ExportDialog.run(activePhoto)
       exportRoot = Prefs.getDefaults().exportRoot
     end
     props.exportRoot         = exportRoot
-    props.preset             = savedPrefs.preset or 'print'
+    props.presetPrint        = savedPrefs.presetPrint
+    props.presetPortfolio    = savedPrefs.presetPortfolio
+    props.presetWeb          = savedPrefs.presetWeb
     props.copyright          = savedPrefs.copyright
     props.creator            = savedPrefs.creator
     props.rights             = savedPrefs.rights
@@ -68,23 +70,20 @@ function ExportDialog.run(activePhoto)
         },
       },
 
-      -- Preset radio buttons
+      -- Preset checkboxes (multi-select; exports run sequentially per preset)
       f:group_box {
-        title = 'Export Preset',
-        f:radio_button {
+        title = 'Export Presets',
+        f:checkbox {
           title = 'print',
-          checked_value = 'print',
-          value = LrView.bind('preset'),
+          value = LrView.bind('presetPrint'),
         },
-        f:radio_button {
+        f:checkbox {
           title = 'portfolio',
-          checked_value = 'portfolio',
-          value = LrView.bind('preset'),
+          value = LrView.bind('presetPortfolio'),
         },
-        f:radio_button {
+        f:checkbox {
           title = 'web',
-          checked_value = 'web',
-          value = LrView.bind('preset'),
+          value = LrView.bind('presetWeb'),
         },
       },
 
@@ -128,6 +127,14 @@ function ExportDialog.run(activePhoto)
     logger:info('ExportDialog result: ' .. tostring(action))
 
     if action == 'ok' then
+      -- At least one preset must be selected. Simpler than re-showing the
+      -- dialog in a loop: warn and treat as cancel.
+      if not (props.presetPrint or props.presetPortfolio or props.presetWeb) then
+        LrDialogs.message(
+          'Structured Export', 'Select at least one preset.', 'warning')
+        return
+      end
+
       -- Always persist the remember-checkbox state itself so the box stays
       -- checked across runs; only persist the other field values when the
       -- user opted in.
@@ -135,7 +142,9 @@ function ExportDialog.run(activePhoto)
       if props.remember then
         Prefs.save({
           exportRoot         = props.exportRoot,
-          preset             = props.preset,
+          presetPrint        = props.presetPrint,
+          presetPortfolio    = props.presetPortfolio,
+          presetWeb          = props.presetWeb,
           copyright          = props.copyright,
           creator            = props.creator,
           rights             = props.rights,
@@ -147,7 +156,9 @@ function ExportDialog.run(activePhoto)
       result.action = 'export'
       result.values = {
         exportRoot         = props.exportRoot,
-        preset             = props.preset,
+        presetPrint        = props.presetPrint,
+        presetPortfolio    = props.presetPortfolio,
+        presetWeb          = props.presetWeb,
         copyright          = props.copyright,
         creator            = props.creator,
         rights             = props.rights,

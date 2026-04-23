@@ -2,7 +2,7 @@
 
 ## Overview
 
-Structured Export is a Lightroom Classic plugin that exports selected photos to a structured iCloud folder tree in up to three preset sizes (print, portfolio, web). It mirrors your Collection Set hierarchy as lowercase-hyphenated folder names, enforces consistent filenames derived from the source camera file number, embeds full IPTC copyright metadata via exiftool, and optionally writes Adobe Content Credentials — all from a single dialog invocation with no manual preset-switching.
+Structured Export is a Lightroom Classic plugin that exports selected photos to a structured folder tree in up to three preset sizes (print, portfolio, web). It mirrors your Collection Set hierarchy as lowercase-hyphenated folder names, enforces consistent filenames derived from the source camera file number, and embeds full IPTC copyright metadata via exiftool. Pick any combination of presets from a single dialog invocation — each selected preset runs sequentially against the same selection.
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
 2. Go to **File → Plug-in Extras → Structured Export**.
 3. Configure the dialog:
    - **Destination** — the folder where files will be exported. Pre-fills with the iCloud Pictures path by default; click **Browse** to choose a different folder. With Remember enabled, the chosen path persists across sessions.
-   - **Export Preset** — `print` (short-edge 2400 px / 300 DPI), `portfolio` (short-edge 2048 px / 240 DPI), or `web` (long-edge 1350 px / 72 DPI).
+   - **Export Presets** — three checkboxes: `print` (short-edge 2400 px / 300 DPI), `portfolio` (short-edge 2048 px / 240 DPI), `web` (long-edge 1350 px / 72 DPI). Pick any combination; each selected preset runs sequentially against the same selection. At least one must be checked; on a no-preset OK click the dialog shows a warning and treats the click as cancel. When multiple presets are selected, the collision pre-scan runs once across all of them — one prompt, one choice that applies uniformly.
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
    - **Remember these settings** — persists current values for the next invocation.
 4. Click **OK** to begin. A progress bar appears; **Cancel** aborts mid-batch cleanly.
