@@ -48,5 +48,16 @@ describe('Prefs', function()
       assert.is_false(got.contentCredentials)
       Prefs._prefsProvider = nil
     end)
+
+    it('remember round-trips both true and false (default is false)', function()
+      local fake = {}
+      Prefs._prefsProvider = function() return fake end
+      assert.is_false(Prefs.load().remember)
+      Prefs.save({ remember = true })
+      assert.is_true(Prefs.load().remember)
+      Prefs.save({ remember = false })
+      assert.is_false(Prefs.load().remember)
+      Prefs._prefsProvider = nil
+    end)
   end)
 end)

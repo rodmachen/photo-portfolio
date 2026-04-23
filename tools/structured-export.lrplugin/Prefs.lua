@@ -17,7 +17,15 @@ function Prefs.getDefaults()
     contactEmail = 'mail@rodmachen.com',
     contentCredentials = true,
     preset             = 'print',
+    remember           = false,
   }
+end
+
+-- `p.key or d.key` swallows a legitimate false value, so use an explicit
+-- nil-check helper for boolean fields whose default may be false.
+local function coalesce(v, default)
+  if v == nil then return default end
+  return v
 end
 
 function Prefs.load()
@@ -29,8 +37,9 @@ function Prefs.load()
     rights       = p.rights       or d.rights,
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
-    contentCredentials = (p.contentCredentials == nil) and d.contentCredentials or p.contentCredentials,
+    contentCredentials = coalesce(p.contentCredentials, d.contentCredentials),
     preset             = p.preset or d.preset,
+    remember           = coalesce(p.remember, d.remember),
   }
 end
 

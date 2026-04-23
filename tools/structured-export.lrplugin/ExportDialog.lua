@@ -27,7 +27,7 @@ function ExportDialog.run(activePhoto)
     props.rights             = savedPrefs.rights
     props.webStatement       = savedPrefs.webStatement
     props.contactEmail       = savedPrefs.contactEmail
-    props.remember           = false
+    props.remember           = savedPrefs.remember or false
 
     -- Override copyright from active photo metadata when available
     if activePhoto then
@@ -107,6 +107,10 @@ function ExportDialog.run(activePhoto)
     logger:info('ExportDialog result: ' .. tostring(action))
 
     if action == 'ok' then
+      -- Always persist the remember-checkbox state itself so the box stays
+      -- checked across runs; only persist the other field values when the
+      -- user opted in.
+      Prefs.save({ remember = props.remember })
       if props.remember then
         Prefs.save({
           preset             = props.preset,
