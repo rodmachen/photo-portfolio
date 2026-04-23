@@ -3,7 +3,7 @@ return {
   LrSdkMinimumVersion = 11.0,
   LrToolkitIdentifier = 'com.rodmachen.structured-export',
   LrPluginName        = 'Structured Export',
-  VERSION             = { major = 0, minor = 1, revision = 0 },
+  VERSION             = { major = 0, minor = 2, revision = 0 },
 
   LrLibraryMenuItems = {
     {

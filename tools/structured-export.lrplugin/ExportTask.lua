@@ -14,13 +14,8 @@ local Presets      = require 'Presets'
 local Metadata     = require 'Metadata'
 local Collections  = require 'Collections'
 local ExportDialog = require 'ExportDialog'
-local CC           = require 'ContentCredentials'
-
 local logger = LrLogger('StructuredExport')
 logger:enable('logfile')
-
-local ROOT = LrPathUtils.getStandardFilePath('home') ..
-  '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
 
 local NO_SELECTION_MSG =
   'Please select one or more Collections or Collection Sets before running Structured Export.'
@@ -47,10 +42,10 @@ local function filterSelection(sources)
   return out
 end
 
-local function collectionDir(entry)
+local function collectionDir(entry, root)
   local segments = entry.pathSegments or {}
   local collectionSlug = Utils.slugify(entry.collection:getName())
-  local dir = ROOT
+  local dir = root
   for _, seg in ipairs(segments) do
     dir = LrPathUtils.child(dir, seg)
   end
@@ -61,12 +56,12 @@ end
 -- Builds a list of export jobs keyed per-collection-preset. Each entry:
 -- { entry = <collections.enumerate row>, dir = <abs dir>, photos = {photo,...},
 --   dests = { [photo] = <abs file path> } }
-local function buildJobs(entries, preset, fallbackSeqStart)
+local function buildJobs(entries, preset, fallbackSeqStart, root)
   local jobs = {}
   local seq = fallbackSeqStart or 1
   for _, entry in ipairs(entries) do
     local usedDests = {}
-    local baseDir = LrPathUtils.child(collectionDir(entry), preset)
+    local baseDir = LrPathUtils.child(collectionDir(entry, root), preset)
     local job = { entry = entry, dir = baseDir, photos = {}, dests = {} }
     local collectionName = entry.collection:getName()
     for _, photo in ipairs(entry.photos) do
@@ -149,11 +144,10 @@ local function buildSettings(preset, values)
   settings.LR_export_useSubfolder = false
   settings.LR_export_destinationPathSuffix = ''
   settings.LR_renamingTokensOn = false
-  CC.apply(settings, values.contentCredentials)
   return settings
 end
 
-local function runJob(job, preset, values, counts, context)
+local function runJob(job, preset, values, counts, context, jobIdx, jobTotal)
   LrFileUtils.createAllDirectories(job.dir)
   local settings = buildSettings(preset, values)
   settings.LR_export_destinationPathPrefix = job.dir
@@ -164,8 +158,9 @@ local function runJob(job, preset, values, counts, context)
   }
 
   local progress = LrProgressScope {
-    title = string.format('Structured Export: %s',
-                          job.entry.collection:getName()),
+    title = string.format('Structured Export: %s (%s — %d of %d)',
+                          job.entry.collection:getName(),
+                          preset, jobIdx, jobTotal),
     functionContext = context,
   }
   progress:setCancelable(true)
@@ -238,14 +233,23 @@ local function runJob(job, preset, values, counts, context)
     -- in the destination folder under their raw camera filenames (e.g.
     -- DSC_7980.jpg) because we never reached the move step for them.
     -- Sweep the folder: delete any .jpg that isn't in the expected
-    -- final-name set for this job.
+    -- final-name set for this job. Sweep multiple times with a short
+    -- sleep between passes: LR's render workers can keep writing files
+    -- to disk after our iterator exits, so a single sweep races the
+    -- queue and leaves late-arriving orphans behind.
     local expected = {}
     for _, dest in pairs(job.dests) do expected[dest] = true end
-    for file in LrFileUtils.files(job.dir) do
-      if not expected[file] and file:lower():match('%.jpe?g$') then
-        logger:info('Removing cancel orphan: ' .. file)
-        LrFileUtils.delete(file)
+    local function sweepOnce()
+      for file in LrFileUtils.files(job.dir) do
+        if not expected[file] and file:lower():match('%.jpe?g$') then
+          logger:info('Removing cancel orphan: ' .. file)
+          LrFileUtils.delete(file)
+        end
       end
+    end
+    for _ = 1, 3 do
+      LrTasks.sleep(1)
+      sweepOnce()
     end
   end
 
@@ -269,7 +273,22 @@ LrTasks.startAsyncTask(function()
     end
 
     local values = dialogResult.values
-    local preset = values.preset
+
+    -- Fixed preset order; only include those the user selected.
+    local selectedPresets = {}
+    if values.presetPrint then
+      selectedPresets[#selectedPresets + 1] = 'print'
+    end
+    if values.presetPortfolio then
+      selectedPresets[#selectedPresets + 1] = 'portfolio'
+    end
+    if values.presetWeb then
+      selectedPresets[#selectedPresets + 1] = 'web'
+    end
+    if #selectedPresets == 0 then
+      logger:error('No presets selected — dialog validation should prevent this')
+      return
+    end
 
     local entries = Collections.enumerate(selection)
     -- Keep only entries that have at least one photo.
@@ -285,17 +304,27 @@ LrTasks.startAsyncTask(function()
       return
     end
 
-    local jobs = buildJobs(nonEmpty, preset, 1)
+    -- Build jobs for every selected preset up front so the collision
+    -- pre-scan can aggregate across all of them and prompt the user once.
+    -- Sequence numbers reset per preset — they are only used as a
+    -- filename-stem fallback via buildCollectionFilename.
+    local jobsByPreset = {}
+    local totalCollisions = 0
+    for _, preset in ipairs(selectedPresets) do
+      local jobs = buildJobs(nonEmpty, preset, 1, values.exportRoot)
+      jobsByPreset[preset] = jobs
+      totalCollisions = totalCollisions + #countCollisions(jobs)
+    end
 
     local counts = { exported = 0, skipped = 0, errors = 0 }
 
-    -- Pre-scan collisions.
-    local collisions = countCollisions(jobs)
-    if #collisions > 0 then
+    -- Single aggregated collision prompt; the user's choice applies to
+    -- all selected presets.
+    if totalCollisions > 0 then
       local choice = LrDialogs.confirm(
         string.format(
           '%d files already exist at the destination. How would you like to handle them?',
-          #collisions),
+          totalCollisions),
         nil,
         'Overwrite All',
         'Cancel',
@@ -303,10 +332,14 @@ LrTasks.startAsyncTask(function()
       if choice == 'cancel' then
         return
       elseif choice == 'other' then
-        local filteredJobs, skippedCount = filterSkipExisting(jobs)
-        jobs = filteredJobs
-        counts.skipped = skippedCount
-        if #jobs == 0 then
+        local anyRemaining = false
+        for _, preset in ipairs(selectedPresets) do
+          local filtered, skipped = filterSkipExisting(jobsByPreset[preset])
+          jobsByPreset[preset] = filtered
+          counts.skipped = counts.skipped + skipped
+          if #filtered > 0 then anyRemaining = true end
+        end
+        if not anyRemaining then
           LrDialogs.message(
             'Structured Export',
             string.format('All selected files already exist. Nothing to export. %d skipped.', counts.skipped),
@@ -322,21 +355,27 @@ LrTasks.startAsyncTask(function()
     -- and yielding through plain pcall triggers
     -- "AgExportSession:addRenditionsForPhotos: must not call on main UI task".
     local shouldBreak = false
-    for _, job in ipairs(jobs) do
+    for _, preset in ipairs(selectedPresets) do
       if shouldBreak then break end
-      local jobOk, jobResult = LrFunctionContext.pcallWithContext(
-        'structuredExport:' .. tostring(job.entry.collection:getName()),
-        function(jobContext)
-          return runJob(job, preset, values, counts, jobContext)
+      local jobs = jobsByPreset[preset]
+      local jobTotal = #jobs
+      for idx, job in ipairs(jobs) do
+        if shouldBreak then break end
+        local jobOk, jobResult = LrFunctionContext.pcallWithContext(
+          'structuredExport:' .. preset .. ':' ..
+            tostring(job.entry.collection:getName()),
+          function(jobContext)
+            return runJob(job, preset, values, counts, jobContext, idx, jobTotal)
+          end
+        )
+        if not jobOk then
+          logger:error('Job failed for collection ' ..
+            tostring(job.entry.collection:getName()) ..
+            ' (' .. preset .. '): ' .. tostring(jobResult))
+          counts.errors = counts.errors + 1
+        elseif jobResult then
+          shouldBreak = true
         end
-      )
-      if not jobOk then
-        logger:error('Job failed for collection ' ..
-          tostring(job.entry.collection:getName()) ..
-          ': ' .. tostring(jobResult))
-        counts.errors = counts.errors + 1
-      elseif jobResult then
-        shouldBreak = true
       end
     end
 
@@ -351,7 +390,7 @@ LrTasks.startAsyncTask(function()
       'Reveal in Finder',
       'OK')
     if action == 'ok' then
-      LrShell.revealInShell(ROOT)
+      LrShell.revealInShell(values.exportRoot)
     end
   end)
 end)

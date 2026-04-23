@@ -1,5 +1,6 @@
 local Prefs = {}
 Prefs._prefsProvider = nil  -- test-injection seam
+Prefs._pathUtils     = nil  -- test-injection seam
 
 local function provider()
   if Prefs._prefsProvider then return Prefs._prefsProvider() end
@@ -7,16 +8,26 @@ local function provider()
   return LrPrefs.prefsForPlugin()
 end
 
+local function pathUtils()
+  if Prefs._pathUtils then return Prefs._pathUtils() end
+  return import 'LrPathUtils'
+end
+
 function Prefs.getDefaults()
   local year = tostring(os.date('%Y'))
+  local pu = pathUtils()
+  local exportRoot = pu.getStandardFilePath('home') ..
+    '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
   return {
     copyright    = '© ' .. year .. ' Rod Machen. All rights reserved.',
     creator      = 'Rod Machen',
     rights       = 'No use without written permission. To license this image, contact mail@rodmachen.com',
     webStatement = 'https://rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
-    contentCredentials = true,
-    preset             = 'print',
+    exportRoot         = exportRoot,
+    presetPrint        = true,
+    presetPortfolio    = false,
+    presetWeb          = false,
     remember           = false,
   }
 end
@@ -37,14 +48,17 @@ function Prefs.load()
     rights       = p.rights       or d.rights,
     webStatement = p.webStatement or d.webStatement,
     contactEmail = p.contactEmail or d.contactEmail,
-    contentCredentials = coalesce(p.contentCredentials, d.contentCredentials),
-    preset             = p.preset or d.preset,
+    exportRoot         = p.exportRoot or d.exportRoot,
+    presetPrint        = coalesce(p.presetPrint, d.presetPrint),
+    presetPortfolio    = coalesce(p.presetPortfolio, d.presetPortfolio),
+    presetWeb          = coalesce(p.presetWeb, d.presetWeb),
     remember           = coalesce(p.remember, d.remember),
   }
 end
 
 function Prefs.save(values)
   local p = provider()
+  -- pairs skips nil values — save({ key = nil }) is a no-op, not a reset.
   for k, v in pairs(values) do p[k] = v end
 end
 
