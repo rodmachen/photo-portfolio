@@ -87,7 +87,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / high. Multi-file route surgery with three rendering branches; ambiguity is low (design fixed in D1/D2, logic tested in Step 3) but the blast radius is the whole site and part of verification is manual.
 - **Context-clear**: no (continuation of Step 3's model). **TDD**: tests-alongside (wiring; logic was TDD'd in Step 3).
 
-### Step 5 — Header nav + mobile responsiveness pass
+### Step 5 — Header nav + mobile responsiveness pass ✅
 - Header nav: brand, top-level tree sections from `getGalleryTree()` (replacing the static Albums link; active state by path prefix), About. CSS-first mobile disclosure menu.
 - Audit breakpoints in `global.css`/`masonry.css`; verify PhotoSwipe touch gestures at phone width.
 - **Files**: `src/components/Header.astro`, `src/styles/global.css`, possibly `src/styles/masonry.css`.
