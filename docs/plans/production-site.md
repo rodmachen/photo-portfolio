@@ -60,7 +60,7 @@ Sonnet / low, tests-alongside (no tests), context-clear: no.
 - **Model/effort**: Sonnet / medium. Config wiring; one mildly unfamiliar corner (Vitest alongside Astro virtual modules — avoided by testing only pure modules); failures are loudly visible in CI, so verification is cheap.
 - **Context-clear**: yes (first implementation step). **TDD**: tests-alongside.
 
-### Step 2 — Env hygiene, README, .env.example
+### Step 2 — Env hygiene, README, .env.example ✅
 - Rename `PUBLIC_CLOUDINARY_API_KEY` → `CLOUDINARY_API_KEY` in `src/lib/cloudinary-search-loader.ts` (build-time only; the PUBLIC_ prefix needlessly exposes it). Read both names during transition with a deprecation warning; document updating Vercel env.
 - Add `.env.example` (names only, no values). Root `README.md`: overview, architecture (Cloudinary folder tree → auto-discovered site), env setup, scripts, plugin pointer, deploy notes.
 - **Files**: `src/lib/cloudinary-search-loader.ts`, `.env.example`, `README.md`.
