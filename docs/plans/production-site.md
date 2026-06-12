@@ -138,7 +138,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / medium. Dialog, prefs, and shell-out patterns all exist in-repo; main risks (quoting, PATH inside Lightroom) are covered by the pure-function tests and the documented probe pattern.
 - **Context-clear**: yes (different language/toolchain). **TDD**: TDD for `buildSyncCommand` and pref defaults; tests-alongside for dialog/task wiring.
 
-### Step 11 — Parity check, production config, cutover runbook
+### Step 11 — Parity check, production config, cutover runbook ✅
 - `docs/cutover.md`: (1) content parity checklist — every gallery on the live Adobe Portfolio site vs the Vercel preview, page by page (presence, photo counts, covers, titles), executed and recorded; (2) Vercel production setup — env vars, deploy hook creation, `photo.rodmachen.com` added to the project; (3) DNS cutover — repoint the CNAME to `cname.vercel-dns.com`, propagation check via `dig`, cert auto-provision; (4) rollback — revert CNAME (Adobe Portfolio untouched as fallback); (5) post-cutover smoke list (home, deep gallery, lightbox, licensing, 404, sitemap, OG share preview); (6) optional legacy-asset convergence (re-upload UI-uploaded collections through sync, delete suffixed originals).
 - **Files**: `docs/cutover.md`, possibly small YAML fixes found during parity.
 - **Verify**: parity checklist complete with every row checked or explicitly waived; preview passes the smoke list. The DNS flip itself happens when Rod chooses; the merge gate is parity-complete + runbook reviewed.
