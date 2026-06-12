@@ -95,7 +95,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / medium. Pure presentation; verification is manual but each check is fast; no unfamiliar internals.
 - **Context-clear**: no. **TDD**: tests-alongside.
 
-### Step 6 — Image delivery polish
+### Step 6 — Image delivery polish ✅
 - `PhotoCard`: verify `CldImage` emits `f_auto`/`q_auto` + srcset; tune `sizes` to the real grid. Add `data-pswp-srcset` so the lightbox serves responsive sizes; cap lightbox dimensions at the source's native size (no upscaling).
 - `Lightbox.astro`: replace the jsDelivr CDN stylesheet link with a bundled `import 'photoswipe/style.css'` (removes a third-party runtime dependency).
 - Eager-load/`fetchpriority` for above-the-fold covers on the home page.
@@ -104,7 +104,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / medium. astro-cloudinary/PhotoSwipe interop is the one unfamiliar-internals area — requires reading emitted HTML; low compounding risk; directly verifiable in built output.
 - **Context-clear**: yes (distinct topic; Steps 3–5 context is noise here). **TDD**: tests-alongside.
 
-### Step 7 — Site completeness: licensing, footer, 404, about
+### Step 7 — Site completeness: licensing, footer, 404, about ✅
 - `src/pages/licensing.astro` with the content structure specified in `docs/lightroom-export-spec.md`. Footer per spec: `© {year} Rod Machen. All rights reserved.` left; `Licensing` + `Contact` (mailto) right; stacked on mobile. `src/pages/404.astro`. About page real copy (placeholder marked for Rod).
 - Fix the WebStatement URL mismatch: the plugin embeds `https://rodmachen.com/licensing` but this site is photo.rodmachen.com — change the plugin default to `https://photo.rodmachen.com/licensing` in `Prefs.lua`, update `prefs_spec.lua` and the spec doc. (Images already exported keep the old URL; the runbook notes a redirect option on rodmachen.com.)
 - **Files**: `src/pages/licensing.astro`, `src/pages/404.astro`, `src/components/Footer.astro`, `src/pages/about.astro`, `tools/structured-export.lrplugin/Prefs.lua`, `tools/spec/prefs_spec.lua`, `docs/lightroom-export-spec.md`.
@@ -112,7 +112,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / medium. Content-heavy and low ambiguity (the spec supplies the copy); the one judgment call (WebStatement URL) is decided above.
 - **Context-clear**: no. **TDD**: tests-alongside (prefs_spec updated with the new default).
 
-### Step 8 — SEO: meta, OG, sitemap, canonical, security headers
+### Step 8 — SEO: meta, OG, sitemap, canonical, security headers ✅
 - `BaseLayout` head: canonical URL, OG/Twitter tags; gallery pages pass `og:image` built from the node cover via a Cloudinary `c_fill` ~1200×630 transform.
 - `astro.config.mjs`: `site: 'https://photo.rodmachen.com'`; add `@astrojs/sitemap` with a filter excluding hidden nodes. Fix `public/robots.txt` to point at `/sitemap-index.xml`.
 - `vercel.json` headers: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN`, minimal `Permissions-Policy`. Strict CSP deferred (Astro inline scripts make it churn-prone) — noted as follow-up.
