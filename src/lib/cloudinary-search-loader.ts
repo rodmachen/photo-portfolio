@@ -34,7 +34,8 @@ export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): 
       const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
 
       if (!cloudName || !apiKey || !apiSecret) {
-        throw new Error('Missing Cloudinary credentials in .env');
+        logger.warn('Cloudinary credentials not found — skipping photo load (set PUBLIC_CLOUDINARY_CLOUD_NAME, PUBLIC_CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
+        return;
       }
 
       logger.info('Loading photos from Cloudinary via Search API');
