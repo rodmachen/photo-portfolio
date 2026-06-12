@@ -1,0 +1,204 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MasonryGrid from '../components/MasonryGrid.astro';
+import PhotoCard from '../components/PhotoCard.astro';
+import AlbumCard from '../components/AlbumCard.astro';
+import Lightbox from '../components/Lightbox.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getCldImageUrl } from 'astro-cloudinary/helpers';
+import { getGalleryTree, flattenTree, getVisibleChildren } from '../lib/site-tree';
+import type { GalleryNode } from '../lib/site-tree';
+import '../styles/masonry.css';
+import '../styles/lightbox.css';
+
+export async function getStaticPaths() {
+  const { tree } = await getGalleryTree();
+  const entries = flattenTree(tree);
+
+  function findNode(nodes: GalleryNode[], pathStr: string): GalleryNode | undefined {
+    for (const n of nodes) {
+      if (n.path.join('/') === pathStr) return n;
+      const hit = findNode(n.children, pathStr);
+      if (hit) return hit;
+    }
+    return undefined;
+  }
+
+  function buildBreadcrumbs(node: GalleryNode) {
+    return node.path.slice(0, -1).map((_, i) => {
+      const pathStr = node.path.slice(0, i + 1).join('/');
+      const ancestor = findNode(tree, pathStr);
+      return { href: `/${pathStr}`, title: ancestor?.title ?? pathStr };
+    });
+  }
+
+  function getSiblingLeaves(node: GalleryNode): GalleryNode[] {
+    const parentPath = node.path.slice(0, -1).join('/');
+    if (parentPath === '') {
+      return tree.filter((n) => !n.hidden);
+    }
+    const parent = findNode(tree, parentPath);
+    return parent ? getVisibleChildren(parent) : [];
+  }
+
+  return entries.map(({ params, node }) => {
+    const crumbs = buildBreadcrumbs(node);
+
+    let prevNode: GalleryNode | undefined;
+    let nextNode: GalleryNode | undefined;
+
+    if (node.children.length === 0) {
+      const siblings = getSiblingLeaves(node);
+      const idx = siblings.findIndex((s) => s.path.join('/') === node.path.join('/'));
+      if (idx !== -1) {
+        if (idx > 0) prevNode = siblings[idx - 1];
+        if (idx < siblings.length - 1) nextNode = siblings[idx + 1];
+      }
+    }
+
+    return {
+      params,
+      props: { node, crumbs, prevNode, nextNode },
+    };
+  });
+}
+
+interface Props {
+  node: GalleryNode;
+  crumbs: Array<{ href: string; title: string }>;
+  prevNode?: GalleryNode;
+  nextNode?: GalleryNode;
+}
+
+const { node, crumbs, prevNode, nextNode } = Astro.props;
+const hasChildren = node.children.length > 0;
+const hasPhotos = node.photos.length > 0;
+const visibleChildren = getVisibleChildren(node);
+
+const ogImage = node.cover
+  ? getCldImageUrl({ src: node.cover, width: 1200, height: 630, crop: 'fill', gravity: 'auto', quality: 'auto', format: 'auto' })
+  : undefined;
+---
+
+<BaseLayout
+  title={`${node.title} — Rod Machen Photography`}
+  description={node.description}
+  ogImage={ogImage}
+  ogType="website"
+>
+  {crumbs.length > 0 && (
+    <Breadcrumbs crumbs={crumbs} current={node.title} />
+  )}
+
+  <header class="gallery-header">
+    <h1>{node.title}</h1>
+    {node.description && <p>{node.description}</p>}
+  </header>
+
+  {hasChildren && (
+    <section class="album-grid">
+      {visibleChildren.map((child) => (
+        <AlbumCard
+          href={`/${child.path.join('/')}`}
+          title={child.title}
+          cover={child.cover}
+          photoCount={child.photoCount}
+        />
+      ))}
+    </section>
+  )}
+
+  {hasPhotos && (
+    <>
+      <MasonryGrid>
+        {node.photos.map((photo) => (
+          <PhotoCard
+            publicId={photo.public_id}
+            width={photo.width as number}
+            height={photo.height as number}
+            alt={photo.display_name as string || ''}
+          />
+        ))}
+      </MasonryGrid>
+
+      <Lightbox />
+    </>
+  )}
+
+  {(prevNode || nextNode) && (
+    <nav class="sibling-nav" aria-label="Gallery navigation">
+      {prevNode ? (
+        <a href={`/${prevNode.path.join('/')}`} class="sibling-link prev">
+          <span class="sibling-arrow">←</span>
+          <span class="sibling-title">{prevNode.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {nextNode && (
+        <a href={`/${nextNode.path.join('/')}`} class="sibling-link next">
+          <span class="sibling-title">{nextNode.title}</span>
+          <span class="sibling-arrow">→</span>
+        </a>
+      )}
+    </nav>
+  )}
+</BaseLayout>
+
+<style>
+  .gallery-header {
+    margin-bottom: 2rem;
+  }
+
+  .gallery-header h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .gallery-header p {
+    color: var(--color-text-muted);
+  }
+
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    .album-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .sibling-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #333);
+  }
+
+  .sibling-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .sibling-link:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .sibling-arrow {
+    font-size: 1rem;
+  }
+</style>

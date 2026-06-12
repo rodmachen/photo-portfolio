@@ -1,0 +1,37 @@
+name: Site CI
+
+# Required repo secrets for the build step:
+#   PUBLIC_CLOUDINARY_CLOUD_NAME
+#   CLOUDINARY_API_KEY
+#   CLOUDINARY_API_SECRET
+# Add these under Settings → Secrets and variables → Actions.
+# The build step is skipped when the secrets are absent (expected on forks and
+# fresh checkouts), so check and test always run without credentials.
+
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  site-ci:
+    runs-on: ubuntu-latest
+    # Forward secrets to env vars; step-level `if:` checks env, not secrets
+    # directly, because GitHub Actions disallows `secrets.*` in `if:` expressions.
+    env:
+      PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.PUBLIC_CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run check
+      - run: npx vitest run
+      - name: Build site (requires Cloudinary secrets)
+        if: env.CLOUDINARY_API_SECRET != ''
+        run: npm run build

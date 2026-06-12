@@ -1,0 +1,60 @@
+{
+  "status": "complete",
+  "commits": ["Step 11: parity check, production config, cutover runbook"],
+  "parity": {
+    "rows": 18,
+    "equal": 3,
+    "discrepancies": [
+      {
+        "page": "atx-open-2024",
+        "adobe_count": 12,
+        "local_count": 18,
+        "detail": "Local build has 6 more photos than Adobe Portfolio — additional uploads to Cloudinary after Adobe Portfolio was last updated. Not a regression."
+      },
+      {
+        "page": "atx-open-2025",
+        "adobe_count": 27,
+        "local_count": 34,
+        "detail": "Local build has 7 more photos than Adobe Portfolio — additional uploads to Cloudinary after Adobe Portfolio was last updated. Not a regression."
+      }
+    ],
+    "deferred_visual": [
+      "2025-austin-125 (9 photos) — not in Cloudinary, not in local build",
+      "theatre/our-town (14 photos) — not yet synced to Cloudinary",
+      "theatre/all-is-calm (14 photos) — not yet synced to Cloudinary",
+      "theatre/into-the-woods (16 photos) — not yet synced to Cloudinary",
+      "theatre/lone-riders (16 photos) — not yet synced to Cloudinary",
+      "theatre/fiddler-on-the-roof (11 photos) — not yet synced to Cloudinary",
+      "theatre/shadowlands (14 photos) — not yet synced to Cloudinary",
+      "europe/england (17 photos) — not yet synced to Cloudinary",
+      "europe/paris (34 photos) — not yet synced to Cloudinary",
+      "europe/ile-de-france (10 photos) — not yet synced to Cloudinary",
+      "europe/the-netherlands (15 photos) — not yet synced to Cloudinary",
+      "europe/belgium (17 photos) — not yet synced to Cloudinary",
+      "europe/austria (20 photos) — not yet synced to Cloudinary"
+    ]
+  },
+  "decisions": [
+    "Theatre and Europe sections deferred to post-cutover — Rod must decide whether to sync before DNS flip or accept Tennis-only launch",
+    "Local build having MORE photos than Adobe Portfolio (2024/2025) is correct: additional uploads after Adobe was last updated",
+    "Adobe Portfolio uses flat URLs (/atx-open-2023) while new site uses nested (/tennis/atx-open-2023) — old URLs will 404 post-cutover; redirects documented but not added (optional)"
+  ],
+  "assumptions": [
+    "Adobe Portfolio image counts obtained via grid__item-container element count in server-rendered HTML",
+    "Local build photo counts obtained via data-pswp-width attribute count in dist HTML",
+    "Cloudinary cloud name is dke4phurv (from existing build)"
+  ],
+  "issues": [],
+  "deferred": [
+    "Theatre (6 galleries, ~85 photos) — needs Lightroom export + sync before these pages appear",
+    "Europe (6 galleries, ~113 photos) — needs Lightroom export + sync before these pages appear",
+    "2025-austin-125 (9 photos) — needs Lightroom export + sync",
+    "URL redirects for flat Adobe Portfolio slugs — optional, add to vercel.json if needed",
+    "Vercel production env vars — manual step in Vercel dashboard",
+    "Deploy hook creation — manual step in Vercel dashboard",
+    "GitHub Actions repo secrets — manual step in GitHub settings",
+    "DNS CNAME flip — at Rod's discretion",
+    "Mobile click-through at 375px — manual verification",
+    "WebStatement redirect on rodmachen.com — optional, on separate domain"
+  ]
+}

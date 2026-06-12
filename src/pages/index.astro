@@ -1,40 +1,31 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AlbumCard from '../components/AlbumCard.astro';
-import { getCollection } from 'astro:content';
+import { getCldImageUrl } from 'astro-cloudinary/helpers';
+import { getGalleryTree } from '../lib/site-tree';
 
-const albums = await getCollection('albums');
-const photos = await getCollection('photos');
-
-// Sort albums by order field
-const sortedAlbums = albums.sort((a, b) => a.data.order - b.data.order);
-
-// Count photos per album — for parent albums, sum all children's folders
-function getPhotoCount(album: (typeof albums)[number]['data']): number {
-  if (album.children) {
-    return album.children.reduce(
-      (sum, child) =>
-        sum + photos.filter((p) => p.data.asset_folder === child.folder).length,
-      0
-    );
-  }
-  return photos.filter((p) => p.data.asset_folder === album.folder).length;
-}
+const { tree } = await getGalleryTree();
+const topLevel = tree.filter((n) => !n.hidden);
+const firstCover = topLevel[0]?.cover;
+const ogImage = firstCover
+  ? getCldImageUrl({ src: firstCover, width: 1200, height: 630, crop: 'fill', gravity: 'auto', quality: 'auto', format: 'auto' })
+  : undefined;
 ---
 
-<BaseLayout>
+<BaseLayout ogImage={ogImage}>
   <section class="hero">
     <h1>Photography</h1>
     <p>by Rod Machen</p>
   </section>
 
   <section class="album-grid">
-    {sortedAlbums.map((album) => (
+    {topLevel.map((node, i) => (
       <AlbumCard
-        slug={album.data.slug}
-        title={album.data.title}
-        cover={album.data.cover}
-        photoCount={getPhotoCount(album.data)}
+        href={`/${node.path.join('/')}`}
+        title={node.title}
+        cover={node.cover}
+        photoCount={node.photoCount}
+        eager={i < 4}
       />
     ))}
   </section>

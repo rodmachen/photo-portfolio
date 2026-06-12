@@ -17,18 +17,20 @@ function Prefs.getDefaults()
   local year = tostring(os.date('%Y'))
   local pu = pathUtils()
   local exportRoot = pu.getStandardFilePath('home') ..
-    '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
+    '/Library/Mobile Documents/com~apple~CloudDocs/Photos'
   return {
     copyright    = '© ' .. year .. ' Rod Machen. All rights reserved.',
     creator      = 'Rod Machen',
     rights       = 'No use without written permission. To license this image, contact mail@rodmachen.com',
-    webStatement = 'https://rodmachen.com/licensing',
+    webStatement = 'https://photo.rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
     exportRoot         = exportRoot,
     presetPrint        = true,
     presetPortfolio    = false,
     presetWeb          = false,
     remember           = false,
+    uploadAfterExport  = false,
+    siteRepoPath       = pu.getStandardFilePath('home') .. '/code/photo-portfolio',
   }
 end
 
@@ -53,6 +55,8 @@ function Prefs.load()
     presetPortfolio    = coalesce(p.presetPortfolio, d.presetPortfolio),
     presetWeb          = coalesce(p.presetWeb, d.presetWeb),
     remember           = coalesce(p.remember, d.remember),
+    uploadAfterExport  = coalesce(p.uploadAfterExport, d.uploadAfterExport),
+    siteRepoPath       = p.siteRepoPath or d.siteRepoPath,
   }
 end
 

@@ -2,26 +2,38 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="About — Rod Machen Photography">
-  <div class="about">
+<BaseLayout
+  title="About — Rod Machen Photography"
+  description="About Rod Machen, photographer."
+>
+  <article class="about-page">
     <h1>About</h1>
+
+    <!-- Placeholder — Rod to write -->
+    <p>[Placeholder — introduce yourself here: your background, what you photograph, and what draws you to it.]</p>
+
+    <h2>What I shoot</h2>
+    <!-- Placeholder — Rod to write -->
+    <p>[Placeholder — describe your primary subjects and style: sports, events, portraiture, landscape, etc.]</p>
+
+    <h2>Gear</h2>
+    <!-- Placeholder — Rod to write -->
+    <p>[Placeholder — mention your camera body/lenses if you&#39;d like to share.]</p>
+
+    <h2>Get in touch</h2>
     <p>
-      Photography by Rod Machen. This site showcases a collection of work
-      across various subjects and locations.
+      For licensing, commissions, or general inquiries:{' '}
+      <a href="mailto:mail@rodmachen.com">mail@rodmachen.com</a>
     </p>
-    <p>
-      For inquiries, reach out at
-      <a href="https://rodmachen.com">rodmachen.com</a>.
-    </p>
-  </div>
+  </article>
 </BaseLayout>
 
 <style>
-  .about {
-    max-width: 640px;
+  .about-page {
+    max-width: 720px;
   }
 
-  .about h1 {
+  .about-page h1 {
     font-size: 2rem;
     font-weight: 300;
     letter-spacing: 0.06em;
@@ -29,9 +41,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-bottom: 1.5rem;
   }
 
-  .about p {
+  .about-page h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .about-page p {
     line-height: 1.7;
     color: var(--color-text-muted);
     margin-bottom: 1rem;
+  }
+
+  .about-page a {
+    color: var(--color-text);
   }
 </style>

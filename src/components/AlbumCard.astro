@@ -2,16 +2,17 @@
 import { CldImage } from 'astro-cloudinary';
 
 interface Props {
-  slug: string;
+  href: string;
   title: string;
   cover: string;
   photoCount: number;
+  eager?: boolean;
 }
 
-const { slug, title, cover, photoCount } = Astro.props;
+const { href, title, cover, photoCount, eager = false } = Astro.props;
 ---
 
-<a href={`/albums/${slug}`} class="album-card">
+<a href={href} class="album-card">
   <div class="album-card-image">
     <CldImage
       src={cover}
@@ -20,8 +21,11 @@ const { slug, title, cover, photoCount } = Astro.props;
       alt={title}
       crop="fill"
       gravity="auto"
+      quality="auto"
+      format="auto"
       sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
-      loading="lazy"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
     />
   </div>
   <div class="album-card-info">

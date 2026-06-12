@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found — Rod Machen Photography">
+  <section class="not-found">
+    <h1>404</h1>
+    <p>This page doesn&#39;t exist.</p>
+    <a href="/">Back to home</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding: 6rem 0;
+  }
+
+  .not-found h1 {
+    font-size: 4rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  .not-found p {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .not-found a {
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+</style>

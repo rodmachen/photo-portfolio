@@ -9,6 +9,7 @@ Structured Export is a Lightroom Classic plugin that exports selected photos to 
 - **Lightroom Classic ≥ 11** for core export functionality (SDK 6.0 minimum).
 - **Lightroom Classic ≥ 13** for Content Credentials support. On older versions the CC toggle is accepted without error but has no effect; the plugin log records the attempt.
 - **exiftool** for extended IPTC fields (Credit, Contact Email, Rights, WebStatement). Install via Homebrew:
+- **Node.js / npm** (optional) for the Cloudinary one-click upload feature. Install via Homebrew or nvm. The plugin resolves npm by absolute path — a Terminal PATH is not sufficient.
 
   ```sh
   brew install exiftool
@@ -35,9 +36,10 @@ Then restart Lightroom Classic and open **File → Plug-in Manager**. Confirm "S
    - **Destination** — the folder where files will be exported. Pre-fills with the iCloud Pictures path by default; click **Browse** to choose a different folder. With Remember enabled, the chosen path persists across sessions.
    - **Export Presets** — three checkboxes: `print` (short-edge 2400 px / 300 DPI), `portfolio` (short-edge 2048 px / 240 DPI), `web` (long-edge 1350 px / 72 DPI). Pick any combination; each selected preset runs sequentially against the same selection. At least one must be checked; on a no-preset OK click the dialog shows a warning and treats the click as cancel. When multiple presets are selected, the collision pre-scan runs once across all of them — one prompt, one choice that applies uniformly.
    - **Copyright / Creator / Rights / Web statement / Contact email** — IPTC fields applied to every exported file. Pre-filled from saved preferences; Copyright overrides with the active photo's catalog value when present.
+   - **Cloudinary Upload** — check "Upload to Cloudinary after export" to automatically run `npm run sync` against the photo-portfolio repo after all presets complete. Set **Repo path** to the absolute path of your local `photo-portfolio` clone (default: `~/code/photo-portfolio`). Sync failures are reported in the summary but do not mark the export failed.
    - **Remember these settings** — persists current values for the next invocation.
 4. Click **OK** to begin. A progress bar appears; **Cancel** aborts mid-batch cleanly.
-5. On completion a summary reports exported / skipped / error counts. Click **Reveal in Finder** to open the chosen Destination root.
+5. On completion a summary reports exported / skipped / error counts (and sync status if enabled). Click **Reveal in Finder** to open the chosen Destination root.
 
 Exported files land at:
 
@@ -80,6 +82,9 @@ These 14 items must all pass before a release is considered complete.
 12. A deliberately broken photo (e.g., a file with a missing source) logs an error, skips, and does not abort the batch.
 13. Summary dialog's "Reveal in Finder" opens the chosen Destination root.
 14. With `exiftool` removed from PATH: plugin runs, logs warning once, exports succeed but lack the extra IPTC fields.
+15. **[v0.3.0]** With "Upload to Cloudinary" checked and a valid repo path: sync runs after export, Cloudinary console shows uploads, deploy hook fires, and summary includes sync status.
+16. **[v0.3.0]** With "Upload to Cloudinary" checked but npm not installed: summary reports "npm not found" without marking export failed.
+17. **[v0.3.0]** With "Upload to Cloudinary" unchecked: no sync attempt; behavior identical to v0.2.0.
 
 ## Troubleshooting
 
@@ -112,6 +117,17 @@ brew install exiftool
 ```
 
 When exiftool is missing the plugin logs one warning per session and continues — copyright and creator are still embedded natively by Lightroom, but the additional IPTC fields (Credit, Contact Email, Rights, WebStatement) are skipped.
+
+**npm not found for Cloudinary sync**
+
+The plugin probes for npm in this order:
+
+1. `/opt/homebrew/bin/npm` (Homebrew on Apple Silicon)
+2. `/usr/local/bin/npm` (Homebrew on Intel)
+3. `/usr/bin/npm`
+4. `~/.nvm/versions/node/<default>/bin/npm` (nvm default alias)
+
+Install via Homebrew (`brew install node`) or nvm. When npm is missing the plugin logs an error and skips sync — the export files are unaffected.
 
 **Content Credentials (deferred)**
 

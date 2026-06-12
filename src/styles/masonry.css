@@ -36,4 +36,8 @@
   .masonry {
     column-count: 1;
   }
+
+  .masonry-item {
+    margin-bottom: 0.75rem;
+  }
 }

@@ -11,19 +11,27 @@ interface Props {
 
 const { publicId, width, height, alt = '' } = Astro.props;
 
-const fullUrl = getCldImageUrl({
+// Full-resolution lightbox URL: native size, auto format/quality, no upscaling.
+const lightboxUrl = getCldImageUrl({
   src: publicId,
-  width: 1600,
   quality: 'auto',
   format: 'auto',
 });
+
+// Responsive srcset for the PhotoSwipe lightbox; capped at source size (2048px short edge).
+const pswpSrcset = [800, 1200, 2048]
+  .filter((w) => w <= width)
+  .concat(width > 2048 ? [] : [])  // already filtered above
+  .map((w) => `${getCldImageUrl({ src: publicId, width: w, quality: 'auto', format: 'auto' })} ${w}w`)
+  .join(', ');
 ---
 
 <div class="masonry-item">
   <a
-    href={fullUrl}
+    href={lightboxUrl}
     data-pswp-width={width}
     data-pswp-height={height}
+    data-pswp-srcset={pswpSrcset || undefined}
     target="_blank"
   >
     <CldImage
@@ -31,6 +39,8 @@ const fullUrl = getCldImageUrl({
       width={600}
       height={Math.round(600 * (height / width))}
       alt={alt}
+      quality="auto"
+      format="auto"
       sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
       loading="lazy"
     />

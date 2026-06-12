@@ -108,6 +108,39 @@ describe("Utils.extractFileNumber", function()
   end)
 end)
 
+describe("Utils.buildSyncCommand", function()
+  it("builds command with plain paths", function()
+    local cmd = Utils.buildSyncCommand('/repo', '/export', '/usr/bin/npm')
+    assert.equals(
+      [[cd '/repo' && PATH="/usr/bin:$PATH" '/usr/bin/npm' run sync -- --root '/export' --preset portfolio --deploy]],
+      cmd)
+  end)
+
+  it("quotes paths containing spaces", function()
+    local cmd = Utils.buildSyncCommand(
+      '/Users/rod/Mobile Documents/photo-portfolio',
+      '/Users/rod/My Export',
+      '/opt/homebrew/bin/npm')
+    assert.equals(
+      "cd '/Users/rod/Mobile Documents/photo-portfolio'" ..
+        " && PATH=\"/opt/homebrew/bin:$PATH\" '/opt/homebrew/bin/npm' run sync" ..
+        " -- --root '/Users/rod/My Export' --preset portfolio --deploy",
+      cmd)
+  end)
+
+  it("escapes single quotes in paths", function()
+    local cmd = Utils.buildSyncCommand(
+      "/Users/rod/Rod's Repo",
+      "/Users/rod/Rod's Export",
+      '/usr/bin/npm')
+    assert.equals(
+      "cd '/Users/rod/Rod'\\''s Repo'" ..
+        " && PATH=\"/usr/bin:$PATH\" '/usr/bin/npm' run sync" ..
+        " -- --root '/Users/rod/Rod'\\''s Export' --preset portfolio --deploy",
+      cmd)
+  end)
+end)
+
 describe("Utils.buildCollectionFilename", function()
   it("uses fileNumber when provided", function()
     assert.equals("my-collection-7877.jpg", Utils.buildCollectionFilename("My Collection", "7877", 1))

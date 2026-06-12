@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Licensing — Rod Machen Photography"
+  description="Copyright and licensing information for Rod Machen's photography."
+>
+  <article class="licensing-page">
+    <h1>Copyright &amp; Licensing</h1>
+
+    <p>
+      All photographs on this site are &copy; Rod Machen. All rights reserved.
+    </p>
+
+    <p>
+      My images may not be downloaded, reproduced, printed, copied, or distributed
+      in any form without prior written permission.
+    </p>
+
+    <h2>What&#39;s not permitted without a license</h2>
+    <ul>
+      <li>Editorial use in publications, blogs, or news outlets</li>
+      <li>Commercial use in advertising, marketing, or products</li>
+      <li>Print reproduction of any kind</li>
+      <li>Posting or sharing on social media without credit and prior approval</li>
+    </ul>
+
+    <h2>Licensing &amp; permissions</h2>
+
+    <p>
+      If you&#39;d like to license an image for editorial, commercial, or personal
+      use, I&#39;d love to hear from you.
+    </p>
+
+    <p>
+      <strong>Email:</strong>{' '}
+      <a href="mailto:mail@rodmachen.com">mail@rodmachen.com</a>
+    </p>
+
+    <p>Please include in your inquiry:</p>
+    <ul>
+      <li>Which image(s) you&#39;re interested in</li>
+      <li>Intended use (editorial, commercial, personal print, etc.)</li>
+      <li>Publication or platform</li>
+      <li>Desired usage period</li>
+    </ul>
+
+    <h2>Attribution &amp; credit</h2>
+
+    <p>
+      When permission is granted, credit should read:{' '}
+      <strong>&copy; Rod Machen / rodmachen.com</strong>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .licensing-page {
+    max-width: 720px;
+  }
+
+  .licensing-page h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .licensing-page h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .licensing-page p,
+  .licensing-page li {
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  .licensing-page ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .licensing-page li {
+    margin-bottom: 0.25rem;
+  }
+
+  .licensing-page a {
+    color: var(--color-text);
+  }
+</style>

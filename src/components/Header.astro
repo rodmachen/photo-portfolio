@@ -1,29 +1,62 @@
 ---
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/albums', label: 'Albums' },
-  { href: '/about', label: 'About' },
-];
+import { getGalleryTree } from '../lib/site-tree';
+
+const { tree } = await getGalleryTree();
+const sections = tree.filter((n) => !n.hidden);
+const pathname = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  return pathname === href || pathname.startsWith(href + '/');
+}
 ---
 
 <header class="site-header">
   <nav class="nav">
     <a href="/" class="nav-brand">Rod Machen</a>
+
     <ul class="nav-links">
-      {navLinks.map(({ href, label }) => (
-        <li>
-          <a href={href} class:list={[{ active: Astro.url.pathname === href }]}>
-            {label}
-          </a>
-        </li>
-      ))}
+      {sections.map((node) => {
+        const href = `/${node.path.join('/')}`;
+        return (
+          <li>
+            <a href={href} class:list={[{ active: isActive(href) }]}>{node.title}</a>
+          </li>
+        );
+      })}
+      <li>
+        <a href="/about" class:list={[{ active: isActive('/about') }]}>About</a>
+      </li>
     </ul>
+
+    <details class="nav-mobile">
+      <summary class="hamburger" aria-label="Navigation menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </summary>
+      <div class="mobile-menu">
+        <ul>
+          {sections.map((node) => {
+            const href = `/${node.path.join('/')}`;
+            return (
+              <li>
+                <a href={href} class:list={[{ active: isActive(href) }]}>{node.title}</a>
+              </li>
+            );
+          })}
+          <li>
+            <a href="/about" class:list={[{ active: isActive('/about') }]}>About</a>
+          </li>
+        </ul>
+      </div>
+    </details>
   </nav>
 </header>
 
 <style>
   .site-header {
     border-bottom: 1px solid var(--color-border);
+    position: relative;
   }
 
   .nav {
@@ -47,6 +80,7 @@ const navLinks = [
     text-decoration: none;
   }
 
+  /* Desktop nav */
   .nav-links {
     list-style: none;
     display: flex;
@@ -64,5 +98,84 @@ const navLinks = [
   .nav-links a.active {
     color: var(--color-text);
     text-decoration: none;
+  }
+
+  /* Mobile nav — hidden on desktop */
+  .nav-mobile {
+    display: none;
+  }
+
+  /* Hamburger button */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    list-style: none;
+    padding: 4px;
+  }
+
+  /* Remove the default disclosure triangle */
+  .hamburger::-webkit-details-marker {
+    display: none;
+  }
+
+  .hamburger::marker {
+    display: none;
+    content: '';
+  }
+
+  .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: var(--color-text);
+    border-radius: 2px;
+  }
+
+  /* Mobile dropdown — full-width panel below the header */
+  .mobile-menu {
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.5rem 1.5rem 1rem;
+    z-index: 100;
+  }
+
+  .mobile-menu ul {
+    list-style: none;
+  }
+
+  .mobile-menu li:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-menu a {
+    display: block;
+    padding: 0.75rem 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .mobile-menu a:hover,
+  .mobile-menu a.active {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  /* Switch to hamburger below 640px */
+  @media (max-width: 640px) {
+    .nav-links {
+      display: none;
+    }
+
+    .nav-mobile {
+      display: block;
+    }
   }
 </style>

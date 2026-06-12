@@ -6,12 +6,23 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "check": "astro check",
+    "sync": "tsx scripts/sync.ts"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@astrojs/vercel": "^9.0.4",
     "astro": "^5.17.1",
     "astro-cloudinary": "^1.3.5",
     "photoswipe": "^5.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "cloudinary": "^2.10.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
   }
 }

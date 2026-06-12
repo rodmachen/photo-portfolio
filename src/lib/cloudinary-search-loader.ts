@@ -24,17 +24,32 @@ const resourceSchema = z.object({
 }).passthrough();
 
 export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): Loader {
-  const { folder, limit = 500 } = options;
+  const { folder, limit = 5000 } = options;
 
   return {
     name: 'cloudinary-search-loader',
     load: async ({ store, logger, generateDigest }) => {
       const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const apiKey = import.meta.env.PUBLIC_CLOUDINARY_API_KEY;
+      let apiKey = import.meta.env.CLOUDINARY_API_KEY;
+      if (!apiKey) {
+        const legacyKey = import.meta.env['PUBLIC_CLOUDINARY_API_KEY'];
+        if (legacyKey) {
+          logger.warn('PUBLIC_CLOUDINARY_API_KEY is deprecated — rename to CLOUDINARY_API_KEY in your Vercel env vars');
+          apiKey = legacyKey;
+        }
+      }
       const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
 
       if (!cloudName || !apiKey || !apiSecret) {
-        throw new Error('Missing Cloudinary credentials in .env');
+        if (import.meta.env.VERCEL) {
+          throw new Error(
+            'Cloudinary credentials missing in a Vercel deployment build. ' +
+            'Set PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and ' +
+            'CLOUDINARY_API_SECRET in the Vercel project environment variables.',
+          );
+        }
+        logger.warn('Cloudinary credentials not found — skipping photo load (set PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
+        return;
       }
 
       logger.info('Loading photos from Cloudinary via Search API');
@@ -76,7 +91,14 @@ export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): 
         if (!nextCursor) break;
       }
 
-      logger.info(`Loaded ${allResources.length} photos`);
+      if (nextCursor !== undefined) {
+        throw new Error(
+          `Cloudinary photo count reached the loader limit of ${limit}. ` +
+          `Raise the limit in content.config.ts to load all photos.`
+        );
+      }
+
+      logger.info(`Loaded ${allResources.length} photos from Cloudinary`);
 
       for (const resource of allResources) {
         store.set({

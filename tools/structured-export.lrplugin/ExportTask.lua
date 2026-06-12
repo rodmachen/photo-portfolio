@@ -379,9 +379,35 @@ LrTasks.startAsyncTask(function()
       end
     end
 
+    local syncMessage = nil
+    if not shouldBreak and values.uploadAfterExport then
+      local npmBin = Utils.resolveNpm()
+      if not npmBin then
+        logger:error('npm not found; Cloudinary sync skipped')
+        syncMessage = 'npm not found — sync skipped. Install Node.js via Homebrew.'
+      elseif not values.siteRepoPath or values.siteRepoPath == '' then
+        logger:error('siteRepoPath is empty; Cloudinary sync skipped')
+        syncMessage = 'Repo path is empty — sync skipped. Set it in the export dialog.'
+      else
+        local cmd = Utils.buildSyncCommand(values.siteRepoPath, values.exportRoot, npmBin)
+        logger:info('Running Cloudinary sync: ' .. cmd)
+        local syncExit = LrTasks.execute(cmd)
+        if syncExit ~= 0 then
+          logger:error('Cloudinary sync failed with exit code ' .. tostring(syncExit))
+          syncMessage = 'Sync failed (exit ' .. tostring(syncExit) .. '). Export files are intact.'
+        else
+          logger:info('Cloudinary sync complete.')
+          syncMessage = 'Sync complete — Cloudinary updated and deploy triggered.'
+        end
+      end
+    end
+
     local summary = string.format(
       '%d exported, %d skipped, %d errors.',
       counts.exported, counts.skipped, counts.errors)
+    if syncMessage then
+      summary = summary .. '\n\n' .. syncMessage
+    end
     logger:info('Export complete. ' .. summary)
 
     local action = LrDialogs.confirm(

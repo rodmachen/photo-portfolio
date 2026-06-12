@@ -29,12 +29,20 @@ When triggered, show a modal dialog with:
    - Copyright string — default: `© {current_year} Rod Machen. All rights reserved.`
    - Creator name — default: `Rod Machen`
    - Rights usage terms — default: `No use without written permission. To license this image, contact mail@rodmachen.com`
-   - Web statement URL — default: `https://rodmachen.com/licensing`
+   - Web statement URL — default: `https://photo.rodmachen.com/licensing`
    - Contact email — default: `mail@rodmachen.com`
 
-4. **"Remember these settings"** checkbox — persist copyright fields and last-used preset to `LrPrefs`.
+4. **Cloudinary Upload** section:
+   - Checkbox: "Upload to Cloudinary after export" — bound to pref `uploadAfterExport` (default `false`).
+   - Text field: "Repo path" — bound to pref `siteRepoPath` (default: `~/code/photo-portfolio`). Must be the absolute path of the local `photo-portfolio` clone.
+   - When enabled, runs `npm run sync -- --root <exportRoot> --preset portfolio --deploy` after all preset passes succeed.
+   - npm is resolved by absolute-path probe (same pattern as exiftool): `/opt/homebrew/bin/npm`, `/usr/local/bin/npm`, `/usr/bin/npm`, nvm default alias.
+   - Sync failure surfaces in the summary dialog but does NOT mark the export failed.
+   - `uploadAfterExport` and `siteRepoPath` are always persisted (not gated on "Remember these settings").
 
-5. **Export** and **Cancel** buttons.
+5. **"Remember these settings"** checkbox — persist copyright fields and last-used preset to `LrPrefs`.
+
+6. **Export** and **Cancel** buttons.
 
 ---
 
@@ -267,7 +275,7 @@ When permission is granted, credit should read: **© Rod Machen / rodmachen.com*
 
 **Implementation notes:**
 - This page should be linked from the footer on every page of the portfolio
-- The URL `https://rodmachen.com/licensing` is what gets embedded in the XMP Web Statement field of every exported image, so this page must exist and be publicly accessible before images are published
+- The URL `https://photo.rodmachen.com/licensing` is what gets embedded in the XMP Web Statement field of every exported image, so this page must exist and be publicly accessible before images are published. Images already exported with the old `rodmachen.com/licensing` URL keep working; add a redirect at rodmachen.com if desired.
 - Keep the page simple and scannable — most visitors will be checking whether they can use an image, not reading carefully
 
 ---

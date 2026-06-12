@@ -1,5 +1,65 @@
 local Utils = {}
 
+local function shellQuote(s)
+  s = tostring(s or '')
+  s = s:gsub("'", "'\\''")
+  return "'" .. s .. "'"
+end
+
+-- Probes for npm binary; caches first hit.
+-- false = not yet resolved; nil = not found
+local _npmPath = false
+
+function Utils.resolveNpm()
+  if _npmPath ~= false then return _npmPath end
+  local candidates = {
+    '/opt/homebrew/bin/npm',
+    '/usr/local/bin/npm',
+    '/usr/bin/npm',
+  }
+  -- Attempt to read the nvm default alias to find a versioned npm
+  local home = os.getenv('HOME') or ''
+  if home ~= '' then
+    local af = io.open(home .. '/.nvm/alias/default', 'r')
+    if af then
+      local ver = af:read('*l')
+      af:close()
+      if ver then
+        ver = ver:gsub('%s+', '')
+        if not ver:match('^v') then ver = 'v' .. ver end
+        candidates[#candidates + 1] = home .. '/.nvm/versions/node/' .. ver .. '/bin/npm'
+      end
+    end
+  end
+  for _, path in ipairs(candidates) do
+    local f = io.open(path, 'r')
+    if f then
+      f:close()
+      _npmPath = path
+      return _npmPath
+    end
+  end
+  _npmPath = nil
+  return nil
+end
+
+-- Builds the shell command that runs `npm run sync` from inside the repo.
+-- npmPath must be an absolute path (GUI apps don't inherit shell PATH).
+-- Both repoPath and exportRoot are single-quote-escaped to handle spaces and
+-- special characters (common in iCloud paths).
+-- The npm binary's parent directory is prepended to PATH so that npm's internal
+-- `#!/usr/bin/env node` shebang resolves node correctly under Lightroom's GUI
+-- shell, which may have a minimal PATH that omits the Homebrew or nvm bin dirs.
+function Utils.buildSyncCommand(repoPath, exportRoot, npmPath)
+  local dir = (npmPath:match('(.*)/')  or ''):gsub('/$', '')
+  local pathEnv = dir ~= '' and ('PATH="' .. dir .. ':$PATH" ') or ''
+  return 'cd ' .. shellQuote(repoPath) ..
+    ' && ' .. pathEnv ..
+    shellQuote(npmPath) ..
+    ' run sync -- --root ' .. shellQuote(exportRoot) ..
+    ' --preset portfolio --deploy'
+end
+
 function Utils.slugify(s)
   if not s or s == "" then return "" end
   s = s:lower()
