@@ -76,7 +76,7 @@ Sonnet / low, tests-alongside (no tests), context-clear: no.
 - **Model/effort**: Opus / high. The load-bearing transformation everything else consumes; real design ambiguity (cover/order/hidden semantics, mixed nodes) and maximal compounding risk — routes, nav, SEO, and sync all sit on it. Verifiability via unit tests is excellent, which is why TDD is mandatory here.
 - **Context-clear**: yes (new chapter). **TDD**: TDD (data transformation).
 
-### Step 4 — Data-model integration + catch-all routes
+### Step 4 — Data-model integration + catch-all routes ✅
 Single step so every commit builds green (schema and routes must swap together):
 - `src/content.config.ts`: replace `albums` schema with the override schema (D2). Loader hardening in `cloudinary-search-loader.ts`: raise limit to 5000, throw instead of silently truncating at the limit, log the loaded count.
 - `src/lib/site-tree.ts`: memoized `getGalleryTree()` bridging `getCollection('photos')`/`getCollection('albums')` into the pure builder.
