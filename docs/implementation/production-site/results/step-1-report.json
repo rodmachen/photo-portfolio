@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "commits": [],
+  "ci": "pending",
+  "decisions": [
+    "Created src/lib/utils.ts with toSlug/toTitle helpers as the pure module under test — these will be used by the gallery-tree builder in Step 3, so they are not throwaway.",
+    "Used a single CI job (site-ci) with a step-level 'if: env.CLOUDINARY_API_SECRET != \"\"' guard for the build step, as GitHub Actions disallows secrets context in job-level if: conditions.",
+    "Vitest config scoped to src/**/*.test.ts with node environment to avoid any Astro virtual-module complications."
+  ],
+  "assumptions": [
+    "The one pre-existing type error in src/pages/albums/[slug].astro ('children is possibly undefined') was a trivial null-safety fix — changed to (children ?? []).map(...) — within the 'fix minimally if trivial' gate.",
+    "24 npm audit vulnerabilities are pre-existing (from prior dependencies); not introduced by vitest/@astrojs/check/typescript and not addressed here."
+  ],
+  "issues": [
+    "npm audit reports 24 vulnerabilities (2 low, 11 moderate, 11 high) in the existing dependency tree — pre-existing, not introduced by this step."
+  ]
+}

@@ -55,7 +55,7 @@ function getPhotoCount(folder: string): number {
     </header>
 
     <section class="album-grid">
-      {children.map((child: any) => (
+      {(children ?? []).map((child: any) => (
         <AlbumCard
           slug={`${album.slug}/${child.slug}`}
           title={child.title}
