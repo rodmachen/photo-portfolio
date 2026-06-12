@@ -5,6 +5,7 @@ import PhotoCard from '../components/PhotoCard.astro';
 import AlbumCard from '../components/AlbumCard.astro';
 import Lightbox from '../components/Lightbox.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { getCldImageUrl } from 'astro-cloudinary/helpers';
 import { getGalleryTree, flattenTree, getVisibleChildren } from '../lib/site-tree';
 import type { GalleryNode } from '../lib/site-tree';
 import '../styles/masonry.css';
@@ -71,11 +72,17 @@ const { node, crumbs, prevNode, nextNode } = Astro.props;
 const hasChildren = node.children.length > 0;
 const hasPhotos = node.photos.length > 0;
 const visibleChildren = getVisibleChildren(node);
+
+const ogImage = node.cover
+  ? getCldImageUrl({ src: node.cover, width: 1200, height: 630, crop: 'fill', gravity: 'auto', quality: 'auto', format: 'auto' })
+  : undefined;
 ---
 
 <BaseLayout
   title={`${node.title} — Rod Machen Photography`}
   description={node.description}
+  ogImage={ogImage}
+  ogType="website"
 >
   {crumbs.length > 0 && (
     <Breadcrumbs crumbs={crumbs} current={node.title} />
