@@ -68,7 +68,7 @@ Sonnet / low, tests-alongside (no tests), context-clear: no.
 - **Model/effort**: Sonnet / low. Mechanical rename plus docs; any mistake surfaces immediately as a build failure.
 - **Context-clear**: no. **TDD**: tests-alongside (nothing to test).
 
-### Step 3 — Gallery tree builder (TDD)
+### Step 3 — Gallery tree builder (TDD) ✅
 - `src/lib/gallery-tree.ts` per D2, pure functions: `buildGalleryTree()`, `deriveTitle()`, natural sort, recursive cover resolution, ordering comparator, reserved-slug validation (throw with clear message on collision, including post-override duplicate slugs), hidden handling, and `flattenTree()` returning `[{params, node}]` for `getStaticPaths` (hidden nodes included — they build but are unlisted).
 - Tests first covering: single-level, three-deep, mixed photo+children nodes, default title/cover/order derivation, cover fallback recursion through photo-less sections, hidden exclusion from children listings, reserved-slug throw, duplicate-slug throw, natural sort (`-801` before `-7877`).
 - **Files**: `src/lib/gallery-tree.ts`, `src/lib/gallery-tree.test.ts`.
