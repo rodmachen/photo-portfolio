@@ -45,6 +45,7 @@ For Vercel deployments, add these three variables in the Vercel project settings
 | `npm run preview` | Serve the built `dist/` locally |
 | `npm run check` | Astro type checking via `astro check` |
 | `npm test` | Run Vitest unit tests |
+| `npm run sync` | Mirror the local export tree to Cloudinary (see below) |
 
 ## Lightroom plugin
 
@@ -56,7 +57,39 @@ For Vercel deployments, add these three variables in the Vercel project settings
 
 See `tools/structured-export.lrplugin/README.md` and `docs/lightroom-export-spec.md` for installation and usage.
 
-A future sync script (`npm run sync`) will mirror the local export tree to Cloudinary and optionally trigger a Vercel rebuild via `VERCEL_DEPLOY_HOOK_URL`.
+## Sync to Cloudinary
+
+`npm run sync` (`scripts/sync.ts`, run via `tsx`) mirrors the local Lightroom export tree to Cloudinary. The diff logic lives in two pure, unit-tested modules — `scripts/lib/local-walk.ts` (build the local inventory) and `scripts/lib/sync-plan.ts` (classify uploads / updates / deletes / unchanged).
+
+**Mapping (plan decision D4).** A local file at `<root>/<set...>/<collection>/<preset>/<name>.jpg` maps to Cloudinary folder `photo-portfolio/<set...>/<collection>` with a deterministic `public_id` of `<folder>/<filename-stem>`. Every path segment is slugified with the same `toSlug` helper the site uses to derive routes, so folder names, the resulting `asset_folder`, and the site URL stay consistent. The deterministic public_id makes re-runs idempotent (overwrite, not duplicate). Change detection compares the local file MD5 against the remote `etag`.
+
+**Default source preset** is `portfolio` (2048px short edge — large enough that Cloudinary transforms never upscale the lightbox). Override with `--preset`.
+
+**Account folder mode.** This Cloudinary account is in **dynamic folder mode**: assets carry an `asset_folder` and the site's gallery tree groups on it. Uploads therefore pass `asset_folder` plus `use_asset_folder_as_public_id_prefix: false` and an explicit `public_id` that already contains the full folder path (per Cloudinary docs, with that flag false the `asset_folder` does not alter the `public_id`). Legacy assets uploaded through the Cloudinary UI have random public_id suffixes (e.g. `atx-open-2025-6959_q3l63c`) and **no** `photo-portfolio/` public_id prefix, so the prefix-based remote listing does not see them — they are never proposed for deletion. Re-syncing a collection that already has legacy assets creates deterministically-named duplicates in the same folder; converging (re-upload then delete the suffixed originals) is a documented manual step in the cutover runbook, not automated here.
+
+### Flags
+
+| Flag | Effect |
+|------|--------|
+| `--dry-run` | Print the plan, perform **no** writes. |
+| `--root <path>` | Export root. Default: `~/Library/Mobile Documents/com~apple~CloudDocs/Photos`. |
+| `--preset <name>` | Preset subfolder to mirror. Default: `portfolio`. |
+| `--filter <substring>` | Only act on assets whose `public_id` contains the substring — use this to scope a run to one collection. |
+| `--delete` | Allow deletion of remote-only assets (off by default; deletions are otherwise reported but inert). |
+| `--deploy` | POST `VERCEL_DEPLOY_HOOK_URL`, but only when something actually changed. |
+
+### First real run
+
+Always preview with `--dry-run` first. Then scope your **first** real run to one small collection with `--filter`, and do **not** pass `--delete`:
+
+```
+npm run sync -- \
+  --root "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Photos" \
+  --preset portfolio \
+  --filter atx-open-2023
+```
+
+Pick the smallest collection you have exported with the `portfolio` preset (substitute its folder slug for `atx-open-2023`). Verify the upload in the Cloudinary console and confirm the new page appears after `npm run build`, then proceed to a full run. If you have only exported the `web` preset so far, either re-export with the `portfolio` preset or add `--preset web` for the test run.
 
 ## Deploy
 
