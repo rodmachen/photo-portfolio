@@ -20,7 +20,7 @@ describe('Prefs', function()
       assert.truthy(d.copyright:find(tostring(os.date('%Y')), 1, true))
       assert.are.equal('Rod Machen', d.creator)
       assert.are.equal('No use without written permission. To license this image, contact mail@rodmachen.com', d.rights)
-      assert.are.equal('https://rodmachen.com/licensing', d.webStatement)
+      assert.are.equal('https://photo.rodmachen.com/licensing', d.webStatement)
       assert.are.equal('mail@rodmachen.com', d.contactEmail)
     end)
 

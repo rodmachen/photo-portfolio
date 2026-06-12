@@ -22,7 +22,7 @@ function Prefs.getDefaults()
     copyright    = '© ' .. year .. ' Rod Machen. All rights reserved.',
     creator      = 'Rod Machen',
     rights       = 'No use without written permission. To license this image, contact mail@rodmachen.com',
-    webStatement = 'https://rodmachen.com/licensing',
+    webStatement = 'https://photo.rodmachen.com/licensing',
     contactEmail = 'mail@rodmachen.com',
     exportRoot         = exportRoot,
     presetPrint        = true,

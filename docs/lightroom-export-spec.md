@@ -29,7 +29,7 @@ When triggered, show a modal dialog with:
    - Copyright string — default: `© {current_year} Rod Machen. All rights reserved.`
    - Creator name — default: `Rod Machen`
    - Rights usage terms — default: `No use without written permission. To license this image, contact mail@rodmachen.com`
-   - Web statement URL — default: `https://rodmachen.com/licensing`
+   - Web statement URL — default: `https://photo.rodmachen.com/licensing`
    - Contact email — default: `mail@rodmachen.com`
 
 4. **"Remember these settings"** checkbox — persist copyright fields and last-used preset to `LrPrefs`.
@@ -267,7 +267,7 @@ When permission is granted, credit should read: **© Rod Machen / rodmachen.com*
 
 **Implementation notes:**
 - This page should be linked from the footer on every page of the portfolio
-- The URL `https://rodmachen.com/licensing` is what gets embedded in the XMP Web Statement field of every exported image, so this page must exist and be publicly accessible before images are published
+- The URL `https://photo.rodmachen.com/licensing` is what gets embedded in the XMP Web Statement field of every exported image, so this page must exist and be publicly accessible before images are published. Images already exported with the old `rodmachen.com/licensing` URL keep working; add a redirect at rodmachen.com if desired.
 - Keep the page simple and scannable — most visitors will be checking whether they can use an image, not reading carefully
 
 ---
