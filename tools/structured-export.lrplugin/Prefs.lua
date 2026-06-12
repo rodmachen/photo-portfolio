@@ -17,7 +17,7 @@ function Prefs.getDefaults()
   local year = tostring(os.date('%Y'))
   local pu = pathUtils()
   local exportRoot = pu.getStandardFilePath('home') ..
-    '/Library/Mobile Documents/com~apple~CloudDocs/iCloud Pictures'
+    '/Library/Mobile Documents/com~apple~CloudDocs/Photos'
   return {
     copyright    = '© ' .. year .. ' Rod Machen. All rights reserved.',
     creator      = 'Rod Machen',

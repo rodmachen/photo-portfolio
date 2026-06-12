@@ -75,7 +75,7 @@ See `tools/structured-export.lrplugin/README.md` and `docs/lightroom-export-spec
 | `--root <path>` | Export root. Default: `~/Library/Mobile Documents/com~apple~CloudDocs/Photos`. |
 | `--preset <name>` | Preset subfolder to mirror. Default: `portfolio`. |
 | `--filter <substring>` | Only act on assets whose `public_id` contains the substring — use this to scope a run to one collection. |
-| `--delete` | Allow deletion of remote-only assets (off by default; deletions are otherwise reported but inert). |
+| `--delete` | Allow deletion of remote-only assets (off by default; deletions are otherwise reported but inert). **Footgun**: any managed asset (`photo-portfolio/*`) absent from the current export root is deleted — if the root contains only some collections, unsynced collections are removed. Always combine with `--filter` to scope deletions to one collection, or verify the plan with `--dry-run` first. |
 | `--deploy` | POST `VERCEL_DEPLOY_HOOK_URL`, but only when something actually changed. |
 
 ### First real run

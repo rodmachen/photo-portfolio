@@ -4,22 +4,20 @@ import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { deriveHiddenPathsFromYaml } from './src/lib/hidden-paths.ts';
 
 // Derive hidden route paths from YAML overrides at config time.
-// These pages build but must be excluded from the sitemap.
+// Uses deriveHiddenPathsFromYaml (which runs toSlug on every segment and
+// applies slug: overrides) so the excluded paths match the built routes
+// exactly, even when folder names contain capitals or underscores.
 const hiddenPaths = new Set();
 try {
   const albumsDir = new URL('./src/content/albums/', import.meta.url).pathname;
   for (const f of readdirSync(albumsDir)) {
     if (!f.endsWith('.yaml') && !f.endsWith('.yml')) continue;
     const content = readFileSync(join(albumsDir, f), 'utf8');
-    if (/^hidden:\s*true/m.test(content)) {
-      const match = content.match(/^path:\s*(.+)$/m);
-      if (match) {
-        const p = match[1].trim().replace(/^\/|\/$/g, '');
-        hiddenPaths.add(`/${p}`);
-        hiddenPaths.add(`/${p}/`);
-      }
+    for (const p of deriveHiddenPathsFromYaml(content)) {
+      hiddenPaths.add(p);
     }
   }
 } catch {

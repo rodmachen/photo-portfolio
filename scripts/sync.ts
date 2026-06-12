@@ -272,6 +272,11 @@ async function applyPlan(
     changes++;
   }
   if (args.delete) {
+    console.log(`\nWARNING: Deleting ${plan.deletes.length} managed remote asset(s).`);
+    console.log('  Any managed asset (photo-portfolio/* prefix) absent from the current');
+    console.log('  export root will be permanently removed from Cloudinary. If the root');
+    console.log('  contains only some collections, unsynced collections will be deleted.');
+    console.log('  Use --filter to scope deletions to one collection.\n');
     for (const asset of plan.deletes) {
       await cloudinary.uploader.destroy(asset.publicId, { invalidate: true });
       console.log(`  deleted ${asset.publicId}`);

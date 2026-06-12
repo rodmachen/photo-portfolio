@@ -50,8 +50,10 @@ export async function getStaticPaths() {
     if (node.children.length === 0) {
       const siblings = getSiblingLeaves(node);
       const idx = siblings.findIndex((s) => s.path.join('/') === node.path.join('/'));
-      if (idx > 0) prevNode = siblings[idx - 1];
-      if (idx < siblings.length - 1) nextNode = siblings[idx + 1];
+      if (idx !== -1) {
+        if (idx > 0) prevNode = siblings[idx - 1];
+        if (idx < siblings.length - 1) nextNode = siblings[idx + 1];
+      }
     }
 
     return {

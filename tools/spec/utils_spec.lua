@@ -112,7 +112,7 @@ describe("Utils.buildSyncCommand", function()
   it("builds command with plain paths", function()
     local cmd = Utils.buildSyncCommand('/repo', '/export', '/usr/bin/npm')
     assert.equals(
-      "cd '/repo' && '/usr/bin/npm' run sync -- --root '/export' --preset portfolio --deploy",
+      [[cd '/repo' && PATH="/usr/bin:$PATH" '/usr/bin/npm' run sync -- --root '/export' --preset portfolio --deploy]],
       cmd)
   end)
 
@@ -123,7 +123,7 @@ describe("Utils.buildSyncCommand", function()
       '/opt/homebrew/bin/npm')
     assert.equals(
       "cd '/Users/rod/Mobile Documents/photo-portfolio'" ..
-        " && '/opt/homebrew/bin/npm' run sync" ..
+        " && PATH=\"/opt/homebrew/bin:$PATH\" '/opt/homebrew/bin/npm' run sync" ..
         " -- --root '/Users/rod/My Export' --preset portfolio --deploy",
       cmd)
   end)
@@ -135,7 +135,7 @@ describe("Utils.buildSyncCommand", function()
       '/usr/bin/npm')
     assert.equals(
       "cd '/Users/rod/Rod'\\''s Repo'" ..
-        " && '/usr/bin/npm' run sync" ..
+        " && PATH=\"/usr/bin:$PATH\" '/usr/bin/npm' run sync" ..
         " -- --root '/Users/rod/Rod'\\''s Export' --preset portfolio --deploy",
       cmd)
   end)

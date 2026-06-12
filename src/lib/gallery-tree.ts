@@ -220,14 +220,26 @@ export function buildGalleryTree(
   }
 
   // 2. Transform raw nodes → GalleryNodes (recursive), applying overrides.
-  function transform(raw: RawNode, parentSlugPath: string[]): GalleryNode {
+  //
+  // Two parallel path arrays are threaded through recursion:
+  //   parentSlugPath    — the rendered route path (respects slug: overrides)
+  //   parentDefaultPath — the default folder-derived path (never modified by
+  //                       slug: overrides), used as the override lookup key at
+  //                       every depth so the documented contract holds: overrides
+  //                       are always matched by the default folder-derived path.
+  function transform(
+    raw: RawNode,
+    parentSlugPath: string[],
+    parentDefaultPath: string[],
+  ): GalleryNode {
     const defaultSlug = toSlug(raw.rawSegment);
-    const defaultPathKey = [...parentSlugPath, defaultSlug].join('/');
+    const defaultPathKey = [...parentDefaultPath, defaultSlug].join('/');
     const override = overrideByPath.get(defaultPathKey);
     if (override) matchedOverridePaths.add(defaultPathKey);
 
     const slug = override?.slug ? toSlug(override.slug) : defaultSlug;
     const path = [...parentSlugPath, slug];
+    const defaultPath = [...parentDefaultPath, defaultSlug];
 
     const ownPhotos = raw.photos
       .slice()
@@ -235,7 +247,7 @@ export function buildGalleryTree(
 
     // Recurse into children, then order them.
     const children = [...raw.children.values()]
-      .map((c) => transform(c, path))
+      .map((c) => transform(c, path, defaultPath))
       .sort(compareNodes);
 
     // Sibling slug-collision detection (also catches slug-override collisions).
@@ -267,7 +279,7 @@ export function buildGalleryTree(
   }
 
   const tree = [...root.children.values()]
-    .map((c) => transform(c, []))
+    .map((c) => transform(c, [], []))
     .sort(compareNodes);
 
   // 3. Reserved-slug validation (top-level only) and top-level uniqueness.

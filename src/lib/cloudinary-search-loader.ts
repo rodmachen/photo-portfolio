@@ -41,6 +41,13 @@ export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): 
       const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
 
       if (!cloudName || !apiKey || !apiSecret) {
+        if (import.meta.env.VERCEL) {
+          throw new Error(
+            'Cloudinary credentials missing in a Vercel deployment build. ' +
+            'Set PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and ' +
+            'CLOUDINARY_API_SECRET in the Vercel project environment variables.',
+          );
+        }
         logger.warn('Cloudinary credentials not found — skipping photo load (set PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
         return;
       }

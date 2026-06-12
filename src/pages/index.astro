@@ -1,13 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AlbumCard from '../components/AlbumCard.astro';
+import { getCldImageUrl } from 'astro-cloudinary/helpers';
 import { getGalleryTree } from '../lib/site-tree';
 
 const { tree } = await getGalleryTree();
 const topLevel = tree.filter((n) => !n.hidden);
+const firstCover = topLevel[0]?.cover;
+const ogImage = firstCover
+  ? getCldImageUrl({ src: firstCover, width: 1200, height: 630, crop: 'fill', gravity: 'auto', quality: 'auto', format: 'auto' })
+  : undefined;
 ---
 
-<BaseLayout>
+<BaseLayout ogImage={ogImage}>
   <section class="hero">
     <h1>Photography</h1>
     <p>by Rod Machen</p>

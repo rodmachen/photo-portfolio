@@ -290,6 +290,28 @@ describe('buildGalleryTree — duplicate-slug validation', () => {
   });
 });
 
+// --- override match-key under slug-renamed parent -------------------------
+
+describe('buildGalleryTree — child override under slug-renamed parent', () => {
+  it('matches child override by default folder-derived path even when parent has a slug override', () => {
+    const { tree } = buildGalleryTree(
+      [photo('p', 'photo-portfolio/tennis/atx-open-2025')],
+      [
+        { path: 'tennis', slug: 'sport' },
+        { path: 'tennis/atx-open-2025', title: 'ATX Open 2025 Championship' },
+      ],
+    );
+    // Parent renamed to 'sport' via slug override — route is /sport/atx-open-2025
+    const sport = findNode(tree, 'sport');
+    expect(sport).toBeDefined();
+    expect(sport!.slug).toBe('sport');
+    // Child override keyed by default path 'tennis/atx-open-2025' must still apply
+    const child = findNode(tree, 'sport/atx-open-2025');
+    expect(child).toBeDefined();
+    expect(child!.title).toBe('ATX Open 2025 Championship');
+  });
+});
+
 // --- unmatched overrides --------------------------------------------------
 
 describe('buildGalleryTree — unmatched overrides', () => {

@@ -162,6 +162,7 @@ Run these checks against `https://photo.rodmachen.com` after the DNS flip and ce
 - [ ] **OG share preview** — paste `https://photo.rodmachen.com` into the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) or [Twitter Card Validator](https://cards-dev.twitter.com/validator); confirm title, description, and OG image render correctly
 - [ ] **Security headers** — `curl -I https://photo.rodmachen.com` shows `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`
 - [ ] **Mobile** — at 375px viewport: nav disclosure menu opens/closes, gallery grid collapses to one column, lightbox swipe gesture works
+- [ ] **About page** — placeholder copy replaced with real content before DNS flip (`/about` must not show `[Placeholder...]` text on launch)
 
 ---
 

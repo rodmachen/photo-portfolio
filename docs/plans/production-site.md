@@ -145,7 +145,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / low. Documentation plus methodical manual comparison; no code ambiguity; the checklist is the verification.
 - **Context-clear**: no. **TDD**: n/a (docs).
 
-### Step 12 — Fix review feedback
+### Step 12 — Fix review feedback ✅
 - Address PR review comments (self-review + any external). Final sweep: `npm run check && npx vitest run && npm run build && (cd tools && busted && luacheck .)`.
 - Commit as "Fix review feedback: <summary>", push, complete only after pushed.
 - **Model/effort**: Sonnet / medium (bump to Opus if review flags tree-builder semantics).

@@ -47,9 +47,15 @@ end
 -- npmPath must be an absolute path (GUI apps don't inherit shell PATH).
 -- Both repoPath and exportRoot are single-quote-escaped to handle spaces and
 -- special characters (common in iCloud paths).
+-- The npm binary's parent directory is prepended to PATH so that npm's internal
+-- `#!/usr/bin/env node` shebang resolves node correctly under Lightroom's GUI
+-- shell, which may have a minimal PATH that omits the Homebrew or nvm bin dirs.
 function Utils.buildSyncCommand(repoPath, exportRoot, npmPath)
+  local dir = (npmPath:match('(.*)/')  or ''):gsub('/$', '')
+  local pathEnv = dir ~= '' and ('PATH="' .. dir .. ':$PATH" ') or ''
   return 'cd ' .. shellQuote(repoPath) ..
-    ' && ' .. shellQuote(npmPath) ..
+    ' && ' .. pathEnv ..
+    shellQuote(npmPath) ..
     ' run sync -- --root ' .. shellQuote(exportRoot) ..
     ' --preset portfolio --deploy'
 end
