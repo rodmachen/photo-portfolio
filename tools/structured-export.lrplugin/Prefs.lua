@@ -29,6 +29,8 @@ function Prefs.getDefaults()
     presetPortfolio    = false,
     presetWeb          = false,
     remember           = false,
+    uploadAfterExport  = false,
+    siteRepoPath       = pu.getStandardFilePath('home') .. '/code/photo-portfolio',
   }
 end
 
@@ -53,6 +55,8 @@ function Prefs.load()
     presetPortfolio    = coalesce(p.presetPortfolio, d.presetPortfolio),
     presetWeb          = coalesce(p.presetWeb, d.presetWeb),
     remember           = coalesce(p.remember, d.remember),
+    uploadAfterExport  = coalesce(p.uploadAfterExport, d.uploadAfterExport),
+    siteRepoPath       = p.siteRepoPath or d.siteRepoPath,
   }
 end
 

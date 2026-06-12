@@ -130,7 +130,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Opus / high. Side effects against the production Cloudinary account, account-mode ambiguity, idempotency requirements, and genuine diff business logic; dry-run + unit tests make it verifiable but mistakes (mass mis-uploads) are costly.
 - **Context-clear**: yes (independent subsystem; only D4 needed). **TDD**: TDD for `sync-plan.ts` and `local-walk.ts`; tests-alongside for the CLI shell. **Dependency note**: adds `cloudinary` (official SDK) and `tsx` as devDeps.
 
-### Step 10 — Plugin one-click upload (v0.3.0)
+### Step 10 — Plugin one-click upload (v0.3.0) ✅
 - New dialog checkbox "Upload to Cloudinary after export" (pref `uploadAfterExport`, default false) + pref `siteRepoPath`. After all preset passes succeed, shell out via the existing `LrTasks.execute` pattern: `cd <siteRepoPath> && npm run sync -- --root <exportRoot> --preset portfolio --deploy`, output logged. Resolve `node`/`npm` by absolute-path probe (same pattern as the exiftool probe — GUI apps don't inherit shell PATH).
 - Build the command string in a pure, busted-testable `Utils.buildSyncCommand(repoPath, exportRoot)` including path quoting. Sync failure surfaces in the summary dialog but does not mark the export failed. Bump `Info.lua`; update plugin README and spec.
 - **Files**: `tools/structured-export.lrplugin/{ExportDialog,ExportTask,Prefs,Utils,Info}.lua`, `tools/spec/{utils_spec,prefs_spec}.lua`, `tools/structured-export.lrplugin/README.md`, `docs/lightroom-export-spec.md`.

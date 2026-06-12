@@ -37,6 +37,8 @@ function ExportDialog.run(activePhoto)
     props.webStatement       = savedPrefs.webStatement
     props.contactEmail       = savedPrefs.contactEmail
     props.remember           = savedPrefs.remember
+    props.uploadAfterExport  = savedPrefs.uploadAfterExport
+    props.siteRepoPath       = savedPrefs.siteRepoPath
 
     -- Override copyright from active photo metadata when available
     if activePhoto then
@@ -123,6 +125,24 @@ function ExportDialog.run(activePhoto)
 
       f:separator { fill_horizontal = 1 },
 
+      -- Cloudinary upload
+      f:group_box {
+        title = 'Cloudinary Upload',
+        f:checkbox {
+          title = 'Upload to Cloudinary after export',
+          value = LrView.bind('uploadAfterExport'),
+        },
+        f:row {
+          f:static_text { title = 'Repo path:', width = 110 },
+          f:edit_field {
+            value = LrView.bind('siteRepoPath'),
+            fill_horizontal = 1,
+          },
+        },
+      },
+
+      f:separator { fill_horizontal = 1 },
+
       -- Remember checkbox
       f:checkbox {
         title = 'Remember these settings',
@@ -148,7 +168,13 @@ function ExportDialog.run(activePhoto)
       -- Always persist the remember-checkbox state itself so the box stays
       -- checked across runs; only persist the other field values when the
       -- user opted in.
-      Prefs.save({ remember = props.remember })
+      -- uploadAfterExport and siteRepoPath are always persisted (they are
+      -- infrastructure settings, not per-export data like copyright).
+      Prefs.save({
+        remember          = props.remember,
+        uploadAfterExport = props.uploadAfterExport,
+        siteRepoPath      = props.siteRepoPath,
+      })
       if props.remember then
         Prefs.save({
           exportRoot         = props.exportRoot,
@@ -174,6 +200,8 @@ function ExportDialog.run(activePhoto)
         rights             = props.rights,
         webStatement       = props.webStatement,
         contactEmail       = props.contactEmail,
+        uploadAfterExport  = props.uploadAfterExport,
+        siteRepoPath       = props.siteRepoPath,
       }
     end
   end)

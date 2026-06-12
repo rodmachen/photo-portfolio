@@ -38,6 +38,18 @@ describe('Prefs', function()
       assert.truthy(d.exportRoot ~= '')
       assert.truthy(d.exportRoot:find('iCloud Pictures', 1, true))
     end)
+
+    it('uploadAfterExport defaults to false', function()
+      local d = Prefs.getDefaults()
+      assert.is_false(d.uploadAfterExport)
+    end)
+
+    it('siteRepoPath defaults to a non-empty string containing code/photo-portfolio', function()
+      local d = Prefs.getDefaults()
+      assert.is_string(d.siteRepoPath)
+      assert.truthy(d.siteRepoPath ~= '')
+      assert.truthy(d.siteRepoPath:find('code/photo%-portfolio', 1, false))
+    end)
   end)
 
   describe('load/save round trip', function()
@@ -104,6 +116,28 @@ describe('Prefs', function()
       Prefs.save({ exportRoot = '/tmp/test-export' })
       got = Prefs.load()
       assert.are.equal('/tmp/test-export', got.exportRoot)
+      Prefs._prefsProvider = nil
+    end)
+
+    it('uploadAfterExport round-trips true and false (default is false)', function()
+      local fake = {}
+      Prefs._prefsProvider = function() return fake end
+      assert.is_false(Prefs.load().uploadAfterExport)
+      Prefs.save({ uploadAfterExport = true })
+      assert.is_true(Prefs.load().uploadAfterExport)
+      Prefs.save({ uploadAfterExport = false })
+      assert.is_false(Prefs.load().uploadAfterExport)
+      Prefs._prefsProvider = nil
+    end)
+
+    it('siteRepoPath falls through to default when not saved, overrides when saved', function()
+      local fake = {}
+      Prefs._prefsProvider = function() return fake end
+      local got = Prefs.load()
+      assert.truthy(got.siteRepoPath:find('code/photo%-portfolio', 1, false))
+      Prefs.save({ siteRepoPath = '/custom/repo' })
+      got = Prefs.load()
+      assert.are.equal('/custom/repo', got.siteRepoPath)
       Prefs._prefsProvider = nil
     end)
   end)

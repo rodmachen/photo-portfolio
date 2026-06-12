@@ -32,9 +32,17 @@ When triggered, show a modal dialog with:
    - Web statement URL — default: `https://photo.rodmachen.com/licensing`
    - Contact email — default: `mail@rodmachen.com`
 
-4. **"Remember these settings"** checkbox — persist copyright fields and last-used preset to `LrPrefs`.
+4. **Cloudinary Upload** section:
+   - Checkbox: "Upload to Cloudinary after export" — bound to pref `uploadAfterExport` (default `false`).
+   - Text field: "Repo path" — bound to pref `siteRepoPath` (default: `~/code/photo-portfolio`). Must be the absolute path of the local `photo-portfolio` clone.
+   - When enabled, runs `npm run sync -- --root <exportRoot> --preset portfolio --deploy` after all preset passes succeed.
+   - npm is resolved by absolute-path probe (same pattern as exiftool): `/opt/homebrew/bin/npm`, `/usr/local/bin/npm`, `/usr/bin/npm`, nvm default alias.
+   - Sync failure surfaces in the summary dialog but does NOT mark the export failed.
+   - `uploadAfterExport` and `siteRepoPath` are always persisted (not gated on "Remember these settings").
 
-5. **Export** and **Cancel** buttons.
+5. **"Remember these settings"** checkbox — persist copyright fields and last-used preset to `LrPrefs`.
+
+6. **Export** and **Cancel** buttons.
 
 ---
 
