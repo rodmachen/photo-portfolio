@@ -24,7 +24,7 @@ const resourceSchema = z.object({
 }).passthrough();
 
 export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): Loader {
-  const { folder, limit = 500 } = options;
+  const { folder, limit = 5000 } = options;
 
   return {
     name: 'cloudinary-search-loader',
@@ -84,7 +84,14 @@ export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): 
         if (!nextCursor) break;
       }
 
-      logger.info(`Loaded ${allResources.length} photos`);
+      if (nextCursor !== undefined) {
+        throw new Error(
+          `Cloudinary photo count reached the loader limit of ${limit}. ` +
+          `Raise the limit in content.config.ts to load all photos.`
+        );
+      }
+
+      logger.info(`Loaded ${allResources.length} photos from Cloudinary`);
 
       for (const resource of allResources) {
         store.set({

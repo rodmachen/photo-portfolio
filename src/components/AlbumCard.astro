@@ -2,16 +2,16 @@
 import { CldImage } from 'astro-cloudinary';
 
 interface Props {
-  slug: string;
+  href: string;
   title: string;
   cover: string;
   photoCount: number;
 }
 
-const { slug, title, cover, photoCount } = Astro.props;
+const { href, title, cover, photoCount } = Astro.props;
 ---
 
-<a href={`/albums/${slug}`} class="album-card">
+<a href={href} class="album-card">
   <div class="album-card-image">
     <CldImage
       src={cover}

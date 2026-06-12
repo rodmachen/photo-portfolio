@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/albums",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/albums/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    }
+  ]
+}

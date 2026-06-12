@@ -1,25 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AlbumCard from '../components/AlbumCard.astro';
-import { getCollection } from 'astro:content';
+import { getGalleryTree } from '../lib/site-tree';
 
-const albums = await getCollection('albums');
-const photos = await getCollection('photos');
-
-// Sort albums by order field
-const sortedAlbums = albums.sort((a, b) => a.data.order - b.data.order);
-
-// Count photos per album — for parent albums, sum all children's folders
-function getPhotoCount(album: (typeof albums)[number]['data']): number {
-  if (album.children) {
-    return album.children.reduce(
-      (sum, child) =>
-        sum + photos.filter((p) => p.data.asset_folder === child.folder).length,
-      0
-    );
-  }
-  return photos.filter((p) => p.data.asset_folder === album.folder).length;
-}
+const { tree } = await getGalleryTree();
+const topLevel = tree.filter((n) => !n.hidden);
 ---
 
 <BaseLayout>
@@ -29,12 +14,12 @@ function getPhotoCount(album: (typeof albums)[number]['data']): number {
   </section>
 
   <section class="album-grid">
-    {sortedAlbums.map((album) => (
+    {topLevel.map((node) => (
       <AlbumCard
-        slug={album.data.slug}
-        title={album.data.title}
-        cover={album.data.cover}
-        photoCount={getPhotoCount(album.data)}
+        href={`/${node.path.join('/')}`}
+        title={node.title}
+        cover={node.cover}
+        photoCount={node.photoCount}
       />
     ))}
   </section>
