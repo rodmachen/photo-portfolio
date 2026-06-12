@@ -51,7 +51,7 @@ Photos are grouped by `asset_folder`; every ancestor segment materializes as a n
 
 Sonnet / low, tests-alongside (no tests), context-clear: no.
 
-### Step 1 — JS quality infra: Vitest, astro check, CI
+### Step 1 — JS quality infra: Vitest, astro check, CI ✅
 - Add devDeps: `vitest`, `@astrojs/check`, `typescript`. Scripts: `test`, `check`.
 - New `.github/workflows/site-ci.yml`: `npm ci`, `astro check`, `vitest run`, then `astro build` conditional on Cloudinary secrets being present (document adding `PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` as repo secrets). Tests and check must pass without network.
 - One smoke spec so the harness demonstrably runs.
