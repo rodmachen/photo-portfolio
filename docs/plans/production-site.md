@@ -121,7 +121,7 @@ Single step so every commit builds green (schema and routes must swap together):
 - **Model/effort**: Sonnet / medium. Standard integrations; the only thought required is the og:image transform; everything is grep-verifiable in dist.
 - **Context-clear**: no. **TDD**: tests-alongside. **Dependency note**: adds `@astrojs/sitemap` (runtime integration, small).
 
-### Step 9 — Cloudinary sync script (TDD for diff logic)
+### Step 9 — Cloudinary sync script (TDD for diff logic) ✅
 - Pure modules first: `scripts/lib/local-walk.ts` (walk export root, find `<.../collection>/<preset>/*.jpg`, map to `{cloudFolder, publicId, absPath, md5}` per D4) and `scripts/lib/sync-plan.ts` (`computeSyncPlan(local, remote)` → `{uploads, updates, deletes, unchanged}` via MD5-vs-etag). Both fully unit-tested.
 - `scripts/sync.ts` CLI (run via `tsx`): fetch remote inventory with the Admin API `resources?prefix=` (paginated; friendlier rate limits than Search), print the plan, apply unless `--dry-run`. Flags: `--delete`, `--deploy` (POSTs `VERCEL_DEPLOY_HOOK_URL`, only when changes occurred), `--root`, `--preset` (default `portfolio`). Upload with explicit `public_id`, `overwrite: true`, `invalidate: true`. **First real run verifies the account's folder mode (dynamic vs fixed — `asset_folder` on existing assets suggests dynamic) against one small collection before any bulk run.**
 - Add devDeps `cloudinary`, `tsx`; script `"sync"`. README section.
