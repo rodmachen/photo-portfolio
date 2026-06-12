@@ -14,12 +14,13 @@ const topLevel = tree.filter((n) => !n.hidden);
   </section>
 
   <section class="album-grid">
-    {topLevel.map((node) => (
+    {topLevel.map((node, i) => (
       <AlbumCard
         href={`/${node.path.join('/')}`}
         title={node.title}
         cover={node.cover}
         photoCount={node.photoCount}
+        eager={i < 4}
       />
     ))}
   </section>
