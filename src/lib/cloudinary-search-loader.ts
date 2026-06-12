@@ -30,11 +30,18 @@ export function cloudinarySearchLoader(options: CloudinarySearchLoaderOptions): 
     name: 'cloudinary-search-loader',
     load: async ({ store, logger, generateDigest }) => {
       const cloudName = import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const apiKey = import.meta.env.PUBLIC_CLOUDINARY_API_KEY;
+      let apiKey = import.meta.env.CLOUDINARY_API_KEY;
+      if (!apiKey) {
+        const legacyKey = import.meta.env['PUBLIC_CLOUDINARY_API_KEY'];
+        if (legacyKey) {
+          logger.warn('PUBLIC_CLOUDINARY_API_KEY is deprecated — rename to CLOUDINARY_API_KEY in your Vercel env vars');
+          apiKey = legacyKey;
+        }
+      }
       const apiSecret = import.meta.env.CLOUDINARY_API_SECRET;
 
       if (!cloudName || !apiKey || !apiSecret) {
-        logger.warn('Cloudinary credentials not found — skipping photo load (set PUBLIC_CLOUDINARY_CLOUD_NAME, PUBLIC_CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
+        logger.warn('Cloudinary credentials not found — skipping photo load (set PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)');
         return;
       }
 
